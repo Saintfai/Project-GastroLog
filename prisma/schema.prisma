@@ -1,0 +1,197 @@
+datasource db {
+  provider  = "postgresql"
+  url       = env("DATABASE_URL")
+  directUrl = env("DIRECT_URL")
+}
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+// ==========================================
+// DEFINISI ENUM
+// ==========================================
+
+enum Gender {
+  MALE
+  FEMALE
+  OTHER
+}
+
+enum GerdSeverity {
+  MILD
+  MODERATE
+  SEVERE
+}
+
+enum MealType {
+  BREAKFAST
+  LUNCH
+  DINNER
+  SNACK
+  DRINK
+}
+
+enum PortionSize {
+  SMALL
+  MEDIUM
+  LARGE
+}
+
+enum SymptomType {
+  HEARTBURN
+  REGURGITATION
+  BLOATING
+  NAUSEA
+  CHEST_PAIN
+  OTHER
+}
+
+enum SleepPosition {
+  FLAT
+  LEFT_SIDE
+  RIGHT_SIDE
+  ELEVATED
+}
+
+enum FoodCategory {
+  GRAIN
+  PROTEIN
+  DAIRY
+  VEGETABLE
+  FRUIT
+  BEVERAGE
+  SNACK
+  OTHER
+}
+
+enum GerdRiskLevel {
+  LOW
+  MEDIUM
+  HIGH
+}
+
+enum NotificationType {
+  MEAL_REMINDER
+  JOURNAL_REMINDER
+  SYMPTOM_CHECK
+}
+
+// ==========================================
+// DEFINISI MODEL / TABEL
+// ==========================================
+
+model User {
+  id             String         @id @default(uuid()) @db.Uuid
+  email          String         @unique
+  passwordHash   String         @map("password_hash")
+  emailVerified  Boolean        @default(false) @map("email_verified")
+  createdAt      DateTime       @default(now()) @map("created_at")
+  updatedAt      DateTime       @updatedAt @map("updated_at")
+  
+  profile        UserProfile?
+  dailyLogs      DailyLog[]
+  notifications  Notification[]
+
+  @@map("users")
+}
+
+model UserProfile {
+  id                 String        @id @default(uuid()) @db.Uuid
+  userId             String        @unique @map("user_id") @db.Uuid
+  user               User          @relation(fields: [userId], references: [id], onDelete: Cascade)
+  age                Int?
+  gender             Gender?
+  gerdSeverity       GerdSeverity? @map("gerd_severity")
+  gerdDurationMonths Int?          @map("gerd_duration_months")
+  medications        String[]
+  foodRestrictions   String[]      @map("food_restrictions")
+
+  @@map("user_profiles")
+}
+
+model DailyLog {
+  id           String        @id @default(uuid()) @db.Uuid
+  userId       String        @map("user_id") @db.Uuid
+  user         User          @relation(fields: [userId], references: [id], onDelete: Cascade)
+  logDate      DateTime      @map("log_date") @db.Date
+  overallScore Int           @default(10) @map("overall_score")
+  notes        String?       @db.Text
+  createdAt    DateTime      @default(now()) @map("created_at")
+  
+  meals        MealLog[]
+  symptoms     SymptomLog[]
+  activities   ActivityLog[]
+
+  @@unique([userId, logDate])
+  @@map("daily_logs")
+}
+
+model MealLog {
+  id         String       @id @default(uuid()) @db.Uuid
+  dailyLogId String       @map("daily_log_id") @db.Uuid
+  dailyLog   DailyLog     @relation(fields: [dailyLogId], references: [id], onDelete: Cascade)
+  foodItemId String?      @map("food_item_id") @db.Uuid
+  foodItem   FoodItem?    @relation(fields: [foodItemId], references: [id])
+  mealType   MealType     @map("meal_type")
+  foodName   String       @map("food_name")
+  mealTime   DateTime     @map("meal_time")
+  portionSize PortionSize? @map("portion_size")
+  notes      String?       @db.Text
+
+  @@map("meal_logs")
+}
+
+model SymptomLog {
+  id              String      @id @default(uuid()) @db.Uuid
+  dailyLogId      String      @map("daily_log_id") @db.Uuid
+  dailyLog        DailyLog    @relation(fields: [dailyLogId], references: [id], onDelete: Cascade)
+  symptomType     SymptomType @map("symptom_type")
+  severity        Int
+  onsetTime       DateTime    @map("onset_time")
+  durationMinutes Int?        @map("duration_minutes")
+  notes           String?       @db.Text
+
+  @@map("symptom_logs")
+}
+
+model ActivityLog {
+  id                   String         @id @default(uuid()) @db.Uuid
+  dailyLogId           String         @map("daily_log_id") @db.Uuid
+  dailyLog             DailyLog       @relation(fields: [dailyLogId], references: [id], onDelete: Cascade)
+  sleepHours           Float?         @map("sleep_hours")
+  sleepPosition        SleepPosition? @map("sleep_position")
+  stressLevel          Int?           @map("stress_level")
+  exerciseDone         Boolean        @default(false) @map("exercise_done")
+  exerciseType         String?        @map("exercise_type")
+  exerciseDurationMin  Int?           @map("exercise_duration_min")
+
+  @@map("activity_logs")
+}
+
+model FoodItem {
+  id            String        @id @default(uuid()) @db.Uuid
+  name          String
+  category      FoodCategory
+  gerdRiskLevel GerdRiskLevel @map("gerd_risk_level")
+  description   String?       @db.Text
+  isVerified    Boolean       @default(false) @map("is_verified")
+  
+  mealLogs      MealLog[]
+
+  @@index([name])
+  @@map("food_items")
+}
+
+model Notification {
+  id          String           @id @default(uuid()) @db.Uuid
+  userId      String           @map("user_id") @db.Uuid
+  user        User             @relation(fields: [userId], references: [id], onDelete: Cascade)
+  type        NotificationType
+  label       String?
+  scheduledAt DateTime         @map("scheduled_at") @db.Time(0)
+  isActive    Boolean          @default(true) @map("is_active")
+  daysOfWeek  Int[]            @map("days_of_week")
+
+  @@map("notifications")
+}
