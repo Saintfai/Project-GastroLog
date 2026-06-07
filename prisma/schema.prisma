@@ -82,18 +82,53 @@ enum NotificationType {
 // ==========================================
 
 model User {
-  id             String         @id @default(uuid()) @db.Uuid
-  email          String         @unique
-  passwordHash   String         @map("password_hash")
-  emailVerified  Boolean        @default(false) @map("email_verified")
-  createdAt      DateTime       @default(now()) @map("created_at")
-  updatedAt      DateTime       @updatedAt @map("updated_at")
+  id            String    @id @default(uuid()) @db.Uuid
+  name          String?   // Ditambahkan untuk nama dari Google
+  email         String    @unique
+  passwordHash  String?   @map("password_hash") // Dibuat opsional (?)
+  emailVerified DateTime? @map("email_verified") // Diubah menjadi DateTime? standar NextAuth
+  image         String?   // Ditambahkan untuk foto profil Google
+  createdAt     DateTime  @default(now()) @map("created_at")
+  updatedAt     DateTime  @updatedAt @map("updated_at")
   
-  profile        UserProfile?
-  dailyLogs      DailyLog[]
-  notifications  Notification[]
+  profile       UserProfile?
+  dailyLogs     DailyLog[]
+  notifications Notification[]
+  accounts      Account[] // Relasi ke tabel Account NextAuth
+  sessions      Session[] // Relasi ke tabel Session NextAuth
 
   @@map("users")
+}
+
+
+model Account {
+  id                 String  @id @default(uuid()) @db.Uuid
+  userId             String  @map("user_id") @db.Uuid
+  type               String
+  provider           String
+  providerAccountId  String  @map("provider_account_id")
+  refresh_token      String? @db.Text
+  access_token       String? @db.Text
+  expires_at         Int?
+  token_type         String?
+  scope              String?
+  id_token           String? @db.Text
+  session_state      String?
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([provider, providerAccountId])
+  @@map("accounts")
+}
+
+model Session {
+  id           String   @id @default(uuid()) @db.Uuid
+  sessionToken String   @unique @map("session_token")
+  userId       String   @map("user_id") @db.Uuid
+  expires      DateTime
+  user         User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@map("sessions")
 }
 
 model UserProfile {
