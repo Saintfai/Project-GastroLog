@@ -1,26 +1,228 @@
 @import "tailwindcss";
 
+/* ============================================================
+   GastroLog Design System — Serene Digestive Care
+   Source: DESIGN.md / Stitch project "GastroLog Smart Reflux Journal"
+   ============================================================ */
+
 :root {
-  --background: #ffffff;
-  --foreground: #171717;
+  /* ── Primary ──────────────────────────────────────── */
+  --color-primary:                    #566342;
+  --color-on-primary:                 #ffffff;
+  --color-primary-container:          #a3b18a;
+  --color-on-primary-container:       #384425;
+  --color-inverse-primary:            #becca3;
+
+  /* ── Secondary ──────────────────────────────────────── */
+  --color-secondary:                  #57615c;
+  --color-on-secondary:               #ffffff;
+  --color-secondary-container:        #dbe5df;
+  --color-on-secondary-container:     #5d6762;
+
+  /* ── Tertiary ───────────────────────────────────────── */
+  --color-tertiary:                   #605e5a;
+  --color-on-tertiary:                #ffffff;
+  --color-tertiary-container:         #aeaba7;
+  --color-on-tertiary-container:      #41403c;
+
+  /* ── Surface ────────────────────────────────────────── */
+  --color-background:                 #f7faf5;
+  --color-on-background:              #191c1a;
+  --color-surface:                    #f7faf5;
+  --color-surface-dim:                #d8dbd6;
+  --color-surface-bright:             #f7faf5;
+  --color-surface-container-lowest:   #ffffff;
+  --color-surface-container-low:      #f1f4f0;
+  --color-surface-container:          #ecefea;
+  --color-surface-container-high:     #e6e9e4;
+  --color-surface-container-highest:  #e0e3df;
+  --color-surface-variant:            #e0e3df;
+  --color-surface-tint:               #566342;
+  --color-on-surface:                 #191c1a;
+  --color-on-surface-variant:         #45483f;
+  --color-inverse-surface:            #2d312e;
+  --color-inverse-on-surface:         #eff2ed;
+
+  /* ── Outline ─────────────────────────────────────────── */
+  --color-outline:                    #76786e;
+  --color-outline-variant:            #c6c8bb;
+
+  /* ── Error ───────────────────────────────────────────── */
+  --color-error:                      #ba1a1a;
+  --color-on-error:                   #ffffff;
+  --color-error-container:            #ffdad6;
+  --color-on-error-container:         #93000a;
+
+  /* ── Typography ──────────────────────────────────────── */
+  --font-sans: 'Inter', sans-serif;
+
+  /* ── Border Radius ───────────────────────────────────── */
+  --radius-sm:      0.25rem;
+  --radius-default: 0.5rem;
+  --radius-md:      0.75rem;
+  --radius-lg:      1rem;
+  --radius-xl:      1.5rem;
+  --radius-full:    9999px;
+
+  /* ── Spacing ─────────────────────────────────────────── */
+  --spacing-xs:              4px;
+  --spacing-sm:              8px;
+  --spacing-md:              16px;
+  --spacing-lg:              20px;
+  --spacing-xl:              24px;
+  --spacing-2xl:             32px;
+  --spacing-3xl:             40px;
+  --touch-target-min:        48px;
+  --gutter:                  16px;
+  --page-margin-mobile:      20px;
+  --page-margin-desktop:     40px;
+
+  /* ── Elevation ───────────────────────────────────────── */
+  --shadow-card: 0px 4px 20px rgba(45, 49, 46, 0.06);
+  --shadow-card-hover: 0px 8px 32px rgba(45, 49, 46, 0.10);
 }
 
-@theme inline {
-  --color-background: var(--background);
-  --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
-}
-
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
-  }
+/* ── Base Reset ──────────────────────────────────────────── */
+*, *::before, *::after {
+  box-sizing: border-box;
 }
 
 body {
-  background: var(--background);
-  color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+  background-color: var(--color-background);
+  color: var(--color-on-surface);
+  font-family: var(--font-sans);
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+/* ── Login Page Animations ───────────────────────────────── */
+@keyframes fadeInUp {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes floatLeaf {
+  0%, 100% { transform: translateY(0px) rotate(0deg); }
+  33%       { transform: translateY(-8px) rotate(3deg); }
+  66%       { transform: translateY(-4px) rotate(-2deg); }
+}
+
+@keyframes shimmer {
+  0%   { background-position: -200% center; }
+  100% { background-position: 200% center; }
+}
+
+@keyframes pulse-ring {
+  0%   { transform: scale(0.95); opacity: 1; }
+  70%  { transform: scale(1.05); opacity: 0.6; }
+  100% { transform: scale(0.95); opacity: 1; }
+}
+
+.animate-fade-in-up {
+  animation: fadeInUp 0.6s ease both;
+}
+.animate-fade-in-up-delay-1 {
+  animation: fadeInUp 0.6s ease 0.1s both;
+}
+.animate-fade-in-up-delay-2 {
+  animation: fadeInUp 0.6s ease 0.2s both;
+}
+.animate-fade-in-up-delay-3 {
+  animation: fadeInUp 0.6s ease 0.3s both;
+}
+.animate-float-leaf {
+  animation: floatLeaf 5s ease-in-out infinite;
+}
+.animate-pulse-ring {
+  animation: pulse-ring 2.5s ease-in-out infinite;
+}
+
+/* ── Google Button ───────────────────────────────────────── */
+.btn-google {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 12px;
+  width: 100%;
+  min-height: var(--touch-target-min);
+  padding: 0 var(--spacing-xl);
+  background-color: var(--color-surface-container-lowest);
+  border: 1.5px solid var(--color-outline-variant);
+  border-radius: var(--radius-lg);
+  color: var(--color-on-surface);
+  font-size: 15px;
+  font-weight: 500;
+  letter-spacing: 0.01em;
+  cursor: pointer;
+  transition: background-color 150ms ease, border-color 150ms ease, transform 100ms ease, box-shadow 150ms ease;
+}
+.btn-google:hover {
+  background-color: var(--color-surface-container-low);
+  border-color: var(--color-primary-container);
+  box-shadow: var(--shadow-card);
+}
+.btn-google:active {
+  transform: scale(0.97);
+}
+
+/* ── Primary Button ──────────────────────────────────────── */
+.btn-primary {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  width: 100%;
+  min-height: var(--touch-target-min);
+  padding: 0 var(--spacing-xl);
+  background-color: var(--color-primary);
+  border: none;
+  border-radius: var(--radius-lg);
+  color: var(--color-on-primary);
+  font-size: 15px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: background-color 150ms ease, transform 100ms ease;
+}
+.btn-primary:hover {
+  background-color: var(--color-primary-container);
+  color: var(--color-on-primary-container);
+}
+.btn-primary:active {
+  transform: scale(0.97);
+}
+
+/* ── Divider ─────────────────────────────────────────────── */
+.divider-with-text {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  color: var(--color-on-surface-variant);
+  font-size: 13px;
+}
+.divider-with-text::before,
+.divider-with-text::after {
+  content: '';
+  flex: 1;
+  height: 1px;
+  background-color: var(--color-outline-variant);
+}
+
+/* ── Chip ────────────────────────────────────────────────── */
+.chip {
+  display: inline-flex;
+  align-items: center;
+  padding: 6px 14px;
+  background-color: var(--color-surface-container);
+  border: 1.5px solid var(--color-outline-variant);
+  border-radius: var(--radius-full);
+  font-size: 13px;
+  font-weight: 500;
+  color: var(--color-on-surface-variant);
+  white-space: nowrap;
 }
