@@ -1,6 +1,17 @@
 import Link from "next/link";
+import { auth } from "@/auth";
+import { redirect } from "next/navigation";
 
-export default function DashboardPage() {
+export default async function DashboardPage() {
+  const session = await auth();
+
+  if (!session?.user) {
+    redirect("/login");
+  }
+
+  const { name, image } = session.user;
+  const firstName = name?.split(" ")[0] || "Pengguna";
+
   return (
     <div 
       className="min-h-screen antialiased pb-28 md:pb-0"
@@ -18,17 +29,26 @@ export default function DashboardPage() {
         }}
       >
         <div className="flex items-center gap-3">
-          <div className="w-10 h-10 rounded-full flex items-center justify-center"
-            style={{ backgroundColor: "var(--color-surface-variant)" }}
-          >
-            <span className="material-symbols-outlined" style={{ color: "var(--color-outline)" }}>person</span>
-          </div>
+          {image ? (
+            <img 
+              src={image} 
+              alt={`Foto profil ${name}`} 
+              className="w-10 h-10 rounded-full object-cover shadow-sm" 
+              referrerPolicy="no-referrer"
+            />
+          ) : (
+            <div className="w-10 h-10 rounded-full flex items-center justify-center"
+              style={{ backgroundColor: "var(--color-surface-variant)" }}
+            >
+              <span className="material-symbols-outlined" style={{ color: "var(--color-outline)" }}>person</span>
+            </div>
+          )}
           <div>
             <h1 className="font-bold" style={{ fontSize: "26px", lineHeight: "32px", letterSpacing: "-0.02em", color: "var(--color-primary)" }}>
               GastroLog
             </h1>
             <p style={{ fontSize: "12px", fontWeight: 600, color: "var(--color-on-surface-variant)" }}>
-              Halo, Pengguna
+              Halo, {firstName}
             </p>
           </div>
         </div>
