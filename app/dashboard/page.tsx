@@ -120,7 +120,7 @@ export default async function DashboardPage() {
 
       {/* ── FAB (Catat Jurnal) ── */}
       <div className="fixed bottom-24 left-0 w-full flex justify-center z-40 md:bottom-8">
-        <button className="flex items-center gap-2 px-6 py-4 rounded-full active:scale-95 transition-all duration-200 hover:opacity-90"
+        <Link href="/dashboard/journal" className="flex items-center gap-2 px-6 py-4 rounded-full active:scale-95 transition-all duration-200 hover:opacity-90"
           style={{ 
             backgroundColor: "var(--color-primary)", 
             color: "var(--color-on-primary)",
@@ -129,7 +129,7 @@ export default async function DashboardPage() {
         >
           <span className="material-symbols-outlined" style={{ fontVariationSettings: "'FILL' 1" }}>edit_document</span>
           <span className="font-medium" style={{ fontSize: "14px" }}>Catat Jurnal</span>
-        </button>
+        </Link>
       </div>
 
       {/* ── BottomNavBar (Mobile Only) ── */}
