@@ -478,3 +478,58 @@ body {
   color: var(--color-on-secondary-container);
   box-shadow: 0 2px 8px rgba(45, 49, 46, 0.06);
 }
+
+/* ── Dashboard Cards & Timeline ─────────────────────────── */
+.log-card {
+  background-color: var(--color-surface-container);
+  border-radius: var(--radius-xl);
+  padding: 20px;
+  box-shadow: none;
+  transition: box-shadow 200ms ease;
+  position: relative;
+  z-index: 10;
+}
+.log-card:hover {
+  box-shadow: var(--shadow-card);
+}
+
+.timeline-connector {
+  position: absolute;
+  left: 35px; /* Centers with the 40px icon (20px padding + 20px half-width - 1px border) */
+  top: 40px;
+  bottom: -40px;
+  width: 2px;
+  background-color: var(--color-surface-variant);
+  z-index: 0;
+}
+.timeline-item:last-child .timeline-connector {
+  display: none;
+}
+
+.score-progress-track {
+  width: 100%;
+  height: 8px;
+  background-color: var(--color-surface-container-highest);
+  border-radius: var(--radius-full);
+  overflow: hidden;
+}
+
+.score-progress-fill {
+  height: 100%;
+  background-color: var(--color-primary);
+  border-radius: var(--radius-full);
+  transition: width 1s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.empty-state {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 40px 20px;
+  text-align: center;
+  color: var(--color-on-surface-variant);
+  border: 1.5px dashed var(--color-outline-variant);
+  border-radius: var(--radius-xl);
+  background-color: rgba(247, 250, 245, 0.5);
+}
