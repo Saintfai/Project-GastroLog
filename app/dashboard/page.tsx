@@ -347,13 +347,13 @@ export default async function DashboardPage() {
           <span className="material-symbols-outlined" style={{ fontVariationSettings: "'FILL' 1" }}>home</span>
           <span className="mt-1 font-semibold" style={{ fontSize: "12px" }}>Home</span>
         </Link>
-        <Link href="#" className="flex flex-col items-center justify-center px-4 py-1 rounded-full transition-colors"
+        <Link href="/dashboard/history" className="flex flex-col items-center justify-center px-4 py-1 rounded-full transition-colors"
           style={{ color: "var(--color-on-surface-variant)" }}
         >
           <span className="material-symbols-outlined">history</span>
           <span className="mt-1 font-semibold" style={{ fontSize: "12px" }}>History</span>
         </Link>
-        <Link href="#" className="flex flex-col items-center justify-center px-4 py-1 rounded-full transition-colors"
+        <Link href="/dashboard/profile" className="flex flex-col items-center justify-center px-4 py-1 rounded-full transition-colors"
           style={{ color: "var(--color-on-surface-variant)" }}
         >
           <span className="material-symbols-outlined">person</span>
