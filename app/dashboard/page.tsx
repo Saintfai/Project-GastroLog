@@ -291,9 +291,14 @@ export default async function DashboardPage() {
 
         {/* ── 3. Pemicu Teratas Section ── */}
         <section className="flex flex-col gap-3">
-          <div className="flex items-center gap-2">
-            <h2 className="font-medium" style={{ fontSize: "16px", color: "var(--color-on-surface-variant)" }}>Pemicu Teratas (7 Hari)</h2>
-            <span className="material-symbols-outlined" style={{ color: "var(--color-outline)", fontSize: "16px" }}>info</span>
+          <div className="flex items-center justify-between gap-2">
+            <div className="flex items-center gap-2">
+              <h2 className="font-medium" style={{ fontSize: "16px", color: "var(--color-on-surface-variant)" }}>Pemicu Teratas (7 Hari)</h2>
+              <span className="material-symbols-outlined" style={{ color: "var(--color-outline)", fontSize: "16px" }}>info</span>
+            </div>
+            <Link href="/dashboard/analytics" style={{ fontSize: "14px", color: "var(--color-primary)", fontWeight: 500 }}>
+              Lihat Analisis
+            </Link>
           </div>
           
           <div className="flex gap-3 overflow-x-auto pb-2" style={{ scrollbarWidth: "none", msOverflowStyle: "none" } as React.CSSProperties}>
@@ -346,6 +351,12 @@ export default async function DashboardPage() {
         >
           <span className="material-symbols-outlined" style={{ fontVariationSettings: "'FILL' 1" }}>home</span>
           <span className="mt-1 font-semibold" style={{ fontSize: "12px" }}>Home</span>
+        </Link>
+        <Link href="/dashboard/analytics" className="flex flex-col items-center justify-center px-4 py-1 rounded-full transition-colors"
+          style={{ color: "var(--color-on-surface-variant)" }}
+        >
+          <span className="material-symbols-outlined">monitoring</span>
+          <span className="mt-1 font-semibold" style={{ fontSize: "12px" }}>Analisis</span>
         </Link>
         <Link href="/dashboard/history" className="flex flex-col items-center justify-center px-4 py-1 rounded-full transition-colors"
           style={{ color: "var(--color-on-surface-variant)" }}

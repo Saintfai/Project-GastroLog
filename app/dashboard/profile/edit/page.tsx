@@ -1,7 +1,7 @@
 import { auth } from "@/auth";
 import { redirect } from "next/navigation";
 import prisma from "@/lib/prisma";
-import { createProfile } from "./actions";
+import { createProfile } from "../actions";
 import { Gender, GerdSeverity } from "@prisma/client";
 
 export default async function OnboardingPage() {
