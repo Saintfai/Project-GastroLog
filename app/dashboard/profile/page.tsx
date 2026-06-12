@@ -294,6 +294,16 @@ export default async function ProfilePage() {
           </span>
         </Link>
         <Link
+          href="/dashboard/analytics"
+          className="flex flex-col items-center justify-center rounded-full px-4 py-1"
+          style={{ color: "var(--color-on-surface-variant)" }}
+        >
+          <span className="material-symbols-outlined">monitoring</span>
+          <span className="mt-1 font-semibold" style={{ fontSize: "12px" }}>
+            Analisis
+          </span>
+        </Link>
+        <Link
           href="/dashboard/history"
           className="flex flex-col items-center justify-center rounded-full px-4 py-1"
           style={{ color: "var(--color-on-surface-variant)" }}
