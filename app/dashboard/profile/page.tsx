@@ -185,17 +185,32 @@ export default async function ProfilePage() {
         >
           <div className="mb-4 flex items-center justify-between gap-3">
             <h2 style={{ fontSize: "18px", fontWeight: 600 }}>Data GERD</h2>
-            <span
-              className="rounded-full px-3 py-1"
-              style={{
-                backgroundColor: "var(--color-secondary-container)",
-                color: "var(--color-on-secondary-container)",
-                fontSize: "12px",
-                fontWeight: 600,
-              }}
-            >
-              Profil dasar
-            </span>
+            <div className="flex items-center gap-2">
+              <span
+                className="rounded-full px-3 py-1"
+                style={{
+                  backgroundColor: "var(--color-secondary-container)",
+                  color: "var(--color-on-secondary-container)",
+                  fontSize: "12px",
+                  fontWeight: 600,
+                }}
+              >
+                Profil dasar
+              </span>
+              {user.profile && (
+                <Link
+                  href="/dashboard/profile/edit"
+                  className="flex items-center gap-0.5 text-xs font-semibold px-2.5 py-1 rounded-full transition-colors active:scale-95 hover:opacity-90"
+                  style={{
+                    backgroundColor: "var(--color-primary-container)",
+                    color: "var(--color-on-primary-container)",
+                  }}
+                >
+                  <span className="material-symbols-outlined" style={{ fontSize: "14px" }}>edit</span>
+                  Edit
+                </Link>
+              )}
+            </div>
           </div>
 
           {user.profile ? (
@@ -248,9 +263,19 @@ export default async function ProfilePage() {
                 clinical_notes
               </span>
               <p>Profil GERD belum dibuat.</p>
-              <p style={{ fontSize: "13px", marginTop: "4px" }}>
-                Form onboarding bisa ditambahkan di tahap berikutnya.
-              </p>
+              <Link
+                href="/dashboard/profile/edit"
+                className="mt-4 inline-flex items-center justify-center rounded-full px-5 py-2.5 active:scale-95 transition-all hover:opacity-90"
+                style={{
+                  backgroundColor: "var(--color-primary)",
+                  color: "var(--color-on-primary)",
+                  fontSize: "13px",
+                  fontWeight: 600,
+                  boxShadow: "0 2px 10px rgba(86, 99, 66, 0.15)",
+                }}
+              >
+                Buat Profil
+              </Link>
             </div>
           )}
         </section>

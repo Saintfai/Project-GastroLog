@@ -123,35 +123,62 @@ export default async function DashboardPage() {
           paddingRight: "var(--spacing-lg)" 
         }}
       >
-        <div className="flex items-center gap-3">
+        <Link 
+          href="/dashboard/profile" 
+          className="flex items-center gap-3 group px-3 py-1.5 rounded-2xl hover:bg-[var(--color-surface-container-low)] active:scale-[0.98] transition-all"
+        >
           {image ? (
             <img 
               src={image} 
               alt={`Foto profil ${name}`} 
-              className="w-10 h-10 rounded-full object-cover shadow-sm" 
+              className="w-10 h-10 rounded-full object-cover shadow-sm group-hover:ring-2 group-hover:ring-[var(--color-primary-container)] transition-all" 
               referrerPolicy="no-referrer"
             />
           ) : (
-            <div className="w-10 h-10 rounded-full flex items-center justify-center"
+            <div className="w-10 h-10 rounded-full flex items-center justify-center transition-all group-hover:bg-[var(--color-primary-container)] group-hover:text-[var(--color-on-primary-container)]"
               style={{ backgroundColor: "var(--color-surface-variant)" }}
             >
               <span className="material-symbols-outlined" style={{ color: "var(--color-outline)" }}>person</span>
             </div>
           )}
           <div>
-            <h1 className="font-bold" style={{ fontSize: "26px", lineHeight: "32px", letterSpacing: "-0.02em", color: "var(--color-primary)" }}>
+            <h1 className="font-bold flex items-center gap-0.5" style={{ fontSize: "24px", lineHeight: "30px", letterSpacing: "-0.02em", color: "var(--color-primary)" }}>
               GastroLog
+              <span className="material-symbols-outlined opacity-0 group-hover:opacity-100 transition-all duration-200 transform translate-x-[-4px] group-hover:translate-x-0" style={{ fontSize: "18px" }}>chevron_right</span>
             </h1>
             <p style={{ fontSize: "12px", fontWeight: 600, color: "var(--color-on-surface-variant)" }}>
               Halo, {firstName}
             </p>
           </div>
+        </Link>
+        <div className="flex items-center gap-2">
+          {/* Desktop Navigation Links */}
+          <div className="hidden md:flex items-center gap-1 mr-4">
+            <Link 
+              href="/dashboard" 
+              className="px-4 py-2 rounded-full text-sm font-semibold text-[var(--color-on-primary-container)] bg-[var(--color-primary-container)] transition-all"
+            >
+              Beranda
+            </Link>
+            <Link 
+              href="/dashboard/history" 
+              className="px-4 py-2 rounded-full text-sm font-semibold text-[var(--color-on-surface-variant)] hover:bg-[var(--color-surface-container-low)] hover:text-[var(--color-primary)] transition-all"
+            >
+              Riwayat
+            </Link>
+            <Link 
+              href="/dashboard/profile" 
+              className="px-4 py-2 rounded-full text-sm font-semibold text-[var(--color-on-surface-variant)] hover:bg-[var(--color-surface-container-low)] hover:text-[var(--color-primary)] transition-all"
+            >
+              Profil
+            </Link>
+          </div>
+          <button className="flex items-center justify-center rounded-full transition-colors hover:bg-[var(--color-surface-container-low)]"
+            style={{ width: "var(--touch-target-min)", height: "var(--touch-target-min)" }}
+          >
+            <span className="material-symbols-outlined" style={{ color: "var(--color-primary)" }}>notifications</span>
+          </button>
         </div>
-        <button className="flex items-center justify-center rounded-full transition-colors"
-          style={{ width: "var(--touch-target-min)", height: "var(--touch-target-min)" }}
-        >
-          <span className="material-symbols-outlined" style={{ color: "var(--color-primary)" }}>notifications</span>
-        </button>
       </header>
 
       {/* ── Main Content Canvas ── */}
