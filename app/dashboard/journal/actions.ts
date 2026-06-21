@@ -3,6 +3,7 @@
 import { auth } from "@/auth";
 import prisma from "@/lib/prisma";
 import { redirect } from "next/navigation";
+import { revalidatePath } from "next/cache";
 import type { MealType, PortionSize, SymptomType } from "@prisma/client";
 
 // ─── Types ────────────────────────────────────────────────
@@ -77,14 +78,9 @@ export async function createJournalEntry(data: JournalFormData) {
   // Set ke tanggal saja (tanpa jam) untuk logDate
   const logDate = new Date(today.getFullYear(), today.getMonth(), today.getDate());
 
-  // Hitung overall score: berdasarkan severity dan stress
-  // Semakin tinggi severity = semakin buruk, stress 1=sangat stres, 5=sangat baik
-  // Score = 10 - severity + (stressLevel - 3) => range ~-2 to ~12, clamp ke 1-10
-  const stressBonus = data.stressLevel - 3; // -2 to +2
-  const rawScore = 10 - data.severity + stressBonus;
-  const overallScore = Math.max(1, Math.min(10, rawScore));
-
-  // Upsert DailyLog (buat baru jika belum ada hari ini, atau gunakan yang ada)
+  // Upsert DailyLog (buat baru jika belum ada hari ini, atau gunakan yang ada).
+  // Skor TIDAK dihitung di sini; dihitung ulang dari data seluruh hari setelah
+  // entri ditambahkan (lihat bagian "Hitung ulang skor harian" di bawah).
   const dailyLog = await prisma.dailyLog.upsert({
     where: {
       userId_logDate: {
@@ -93,13 +89,11 @@ export async function createJournalEntry(data: JournalFormData) {
       },
     },
     update: {
-      overallScore: overallScore,
       notes: data.notes || undefined,
     },
     create: {
       userId: user.id,
       logDate: logDate,
-      overallScore: overallScore,
       notes: data.notes || undefined,
     },
   });
@@ -144,5 +138,114 @@ export async function createJournalEntry(data: JournalFormData) {
     },
   });
 
+  // Hitung ulang skor harian dari seluruh data hari ini.
+  await recalcDailyScore(dailyLog.id);
+
   redirect("/dashboard");
+}
+
+// ─── Hitung ulang skor harian dari SELURUH data hari itu ───
+// Skor mencerminkan kondisi sepanjang hari, bukan hanya satu entri.
+// - Gejala: dipakai keparahan rata-rata (semakin parah = skor turun).
+//   Hari tanpa gejala sama sekali tidak dihukum (severity dianggap 0).
+// - Stres: rata-rata stres harian memberi bonus/penalti (-2..+2).
+// Helper internal (tidak diekspor) supaya tidak menjadi server action publik.
+async function recalcDailyScore(dailyLogId: string) {
+  const [symptomAgg, stressAgg] = await Promise.all([
+    prisma.symptomLog.aggregate({
+      where: { dailyLogId },
+      _avg: { severity: true },
+    }),
+    prisma.activityLog.aggregate({
+      where: { dailyLogId },
+      _avg: { stressLevel: true },
+    }),
+  ]);
+
+  const avgSeverity = symptomAgg._avg.severity ?? 0; // 0 = tidak ada gejala
+  const avgStress = stressAgg._avg.stressLevel ?? 3; // 3 = netral
+  const stressBonus = avgStress - 3; // -2..+2
+  const rawScore = 10 - avgSeverity + stressBonus;
+  const overallScore = Math.max(1, Math.min(10, Math.round(rawScore)));
+
+  await prisma.dailyLog.update({
+    where: { id: dailyLogId },
+    data: { overallScore },
+  });
+}
+
+// ─── Hapus satu MealLog (dengan cek kepemilikan) ───────────
+export async function deleteMealLog(mealLogId: string) {
+  const userId = await requireUserId();
+
+  // Pastikan item ini milik user yang login sebelum dihapus.
+  const meal = await prisma.mealLog.findFirst({
+    where: { id: mealLogId, dailyLog: { userId } },
+    select: { dailyLogId: true },
+  });
+
+  if (!meal) {
+    return { success: false, error: "Entri tidak ditemukan." };
+  }
+
+  await prisma.mealLog.delete({ where: { id: mealLogId } });
+  await finalizeDailyLog(meal.dailyLogId);
+
+  revalidatePath("/dashboard");
+  revalidatePath("/dashboard/history");
+  return { success: true };
+}
+
+// ─── Hapus satu SymptomLog (dengan cek kepemilikan) ────────
+export async function deleteSymptomLog(symptomLogId: string) {
+  const userId = await requireUserId();
+
+  const symptom = await prisma.symptomLog.findFirst({
+    where: { id: symptomLogId, dailyLog: { userId } },
+    select: { dailyLogId: true },
+  });
+
+  if (!symptom) {
+    return { success: false, error: "Gejala tidak ditemukan." };
+  }
+
+  await prisma.symptomLog.delete({ where: { id: symptomLogId } });
+  await finalizeDailyLog(symptom.dailyLogId);
+
+  revalidatePath("/dashboard");
+  revalidatePath("/dashboard/history");
+  return { success: true };
+}
+
+// ─── Util: ambil userId dari session atau redirect ke login ─
+async function requireUserId(): Promise<string> {
+  const session = await auth();
+  if (!session?.user?.email) {
+    redirect("/login");
+  }
+  const user = await prisma.user.findUnique({
+    where: { email: session.user.email },
+    select: { id: true },
+  });
+  if (!user) {
+    redirect("/login");
+  }
+  return user.id;
+}
+
+// ─── Util: setelah hapus, hitung ulang skor; hapus DailyLog
+// bila sudah tidak ada makanan & gejala tersisa ──────────────
+async function finalizeDailyLog(dailyLogId: string) {
+  const [mealCount, symptomCount] = await Promise.all([
+    prisma.mealLog.count({ where: { dailyLogId } }),
+    prisma.symptomLog.count({ where: { dailyLogId } }),
+  ]);
+
+  if (mealCount === 0 && symptomCount === 0) {
+    // Hari ini jadi kosong — buang DailyLog (ActivityLog ikut terhapus via cascade).
+    await prisma.dailyLog.delete({ where: { id: dailyLogId } });
+    return;
+  }
+
+  await recalcDailyScore(dailyLogId);
 }

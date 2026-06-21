@@ -2,6 +2,7 @@ import Link from "next/link";
 import { auth } from "@/auth";
 import { redirect } from "next/navigation";
 import prisma from "@/lib/prisma";
+import DeleteEntryButton from "./DeleteEntryButton";
 
 export default async function DashboardPage() {
   const session = await auth();
@@ -263,9 +264,16 @@ export default async function DashboardPage() {
                       <h3 style={{ fontSize: "16px", fontWeight: 500, color: "var(--color-on-surface)" }}>
                         {item.type === "meal" ? item.data.foodName : item.data.symptomType}
                       </h3>
-                      <span style={{ fontSize: "12px", color: "var(--color-on-surface-variant)", fontWeight: 500 }}>
-                        {formatTime(item.time)}
-                      </span>
+                      <div className="flex items-center gap-1 shrink-0">
+                        <span style={{ fontSize: "12px", color: "var(--color-on-surface-variant)", fontWeight: 500 }}>
+                          {formatTime(item.time)}
+                        </span>
+                        <DeleteEntryButton
+                          id={item.id}
+                          type={item.type}
+                          label={item.type === "meal" ? item.data.foodName : item.data.symptomType}
+                        />
+                      </div>
                     </div>
 
                     {item.type === "meal" ? (
