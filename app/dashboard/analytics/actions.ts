@@ -20,8 +20,8 @@ async function requireUserId(): Promise<string> {
   return user.id;
 }
 
-export async function getAnalyticsData(period: number) {
-  const userId = await requireUserId();
+export async function getAnalyticsData(period: number, passedUserId?: string) {
+  const userId = passedUserId || await requireUserId();
 
   const today = new Date();
   const startOfToday = new Date(today.getFullYear(), today.getMonth(), today.getDate());

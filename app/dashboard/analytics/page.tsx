@@ -32,7 +32,7 @@ export default async function AnalyticsPage() {
   }
 
   // Load data awal untuk rentang waktu default (7 hari)
-  const initialData = await getAnalyticsData(7);
+  const initialData = await getAnalyticsData(7, user.id);
   const { summary } = initialData;
 
   const translatedSymptom = symptomLabels[summary.mostFrequentSymptom] || summary.mostFrequentSymptom;

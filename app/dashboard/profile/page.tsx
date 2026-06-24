@@ -22,28 +22,29 @@ export default async function ProfilePage() {
     redirect("/login");
   }
 
-  const user = await prisma.user.findUnique({
-    where: { email: session.user.email },
-    include: {
-      profile: true,
-      _count: {
-        select: {
-          dailyLogs: true,
-          notifications: true,
+  const [user, latestLog] = await Promise.all([
+    prisma.user.findUnique({
+      where: { email: session.user.email },
+      include: {
+        profile: true,
+        _count: {
+          select: {
+            dailyLogs: true,
+            notifications: true,
+          },
         },
       },
-    },
-  });
+    }),
+    prisma.dailyLog.findFirst({
+      where: { user: { email: session.user.email } },
+      orderBy: { logDate: "desc" },
+      select: { logDate: true, overallScore: true },
+    }),
+  ]);
 
   if (!user) {
     redirect("/login");
   }
-
-  const latestLog = await prisma.dailyLog.findFirst({
-    where: { userId: user.id },
-    orderBy: { logDate: "desc" },
-    select: { logDate: true, overallScore: true },
-  });
 
   return (
     <div

@@ -30,24 +30,34 @@ export default async function DashboardPage() {
   const sevenDaysAgo = new Date(startOfToday);
   sevenDaysAgo.setDate(sevenDaysAgo.getDate() - 7);
 
-  // 1. Fetch Today's Log
-  const todayLog = await prisma.dailyLog.findUnique({
-    where: {
-      userId_logDate: {
-        userId: user.id,
-        logDate: startOfToday,
+  // Fetch Today's Log & High Symptom Logs (Last 7 days) in parallel
+  const [todayLog, highSymptomLogs] = await Promise.all([
+    prisma.dailyLog.findUnique({
+      where: {
+        userId_logDate: {
+          userId: user.id,
+          logDate: startOfToday,
+        },
       },
-    },
-    include: {
-      meals: {
-        include: { foodItem: true },
-        orderBy: { mealTime: "desc" },
+      include: {
+        meals: {
+          include: { foodItem: true },
+          orderBy: { mealTime: "desc" },
+        },
+        symptoms: {
+          orderBy: { onsetTime: "desc" },
+        },
       },
-      symptoms: {
-        orderBy: { onsetTime: "desc" },
+    }),
+    prisma.symptomLog.findMany({
+      where: {
+        dailyLog: { userId: user.id },
+        severity: { gte: 5 },
+        onsetTime: { gte: sevenDaysAgo },
       },
-    },
-  });
+      select: { dailyLogId: true },
+    }),
+  ]);
 
   // Combine and sort today's activities (meals and symptoms)
   type TimelineItem = 
@@ -76,17 +86,6 @@ export default async function DashboardPage() {
     else if (score <= 9) scoreLabel = "Baik";
     else scoreLabel = "Sangat baik";
   }
-
-  // 2. Fetch Top Triggers (Last 7 days)
-  // Get symptom logs with severity >= 5
-  const highSymptomLogs = await prisma.symptomLog.findMany({
-    where: {
-      dailyLog: { userId: user.id },
-      severity: { gte: 5 },
-      onsetTime: { gte: sevenDaysAgo },
-    },
-    select: { dailyLogId: true },
-  });
 
   const triggerDailyLogIds = Array.from(new Set(highSymptomLogs.map(s => s.dailyLogId)));
   
