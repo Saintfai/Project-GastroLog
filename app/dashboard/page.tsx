@@ -168,6 +168,12 @@ export default async function DashboardPage() {
               Riwayat
             </Link>
             <Link 
+              href="/dashboard/analytics" 
+              className="px-4 py-2 rounded-full text-sm font-semibold text-[var(--color-on-surface-variant)] hover:bg-[var(--color-surface-container-low)] hover:text-[var(--color-primary)] transition-all"
+            >
+              Analitik
+            </Link>
+            <Link 
               href="/dashboard/profile" 
               className="px-4 py-2 rounded-full text-sm font-semibold text-[var(--color-on-surface-variant)] hover:bg-[var(--color-surface-container-low)] hover:text-[var(--color-primary)] transition-all"
             >
@@ -376,23 +382,29 @@ export default async function DashboardPage() {
       <nav className="fixed bottom-0 left-0 w-full z-50 flex justify-around items-center px-4 pb-4 pt-2 shadow-sm rounded-t-xl md:hidden"
         style={{ backgroundColor: "var(--color-surface-container-lowest)" }}
       >
-        <Link href="/dashboard" className="flex flex-col items-center justify-center rounded-full px-4 py-1 transition-transform duration-150 active:scale-95"
+        <Link href="/dashboard" className="flex flex-col items-center justify-center rounded-full px-3 py-1 transition-transform duration-150 active:scale-95"
           style={{ backgroundColor: "var(--color-secondary-container)", color: "var(--color-on-secondary-container)" }}
         >
           <span className="material-symbols-outlined" style={{ fontVariationSettings: "'FILL' 1" }}>home</span>
-          <span className="mt-1 font-semibold" style={{ fontSize: "12px" }}>Home</span>
+          <span className="mt-1 font-semibold" style={{ fontSize: "11px" }}>Home</span>
         </Link>
-        <Link href="/dashboard/history" className="flex flex-col items-center justify-center px-4 py-1 rounded-full transition-colors"
+        <Link href="/dashboard/history" className="flex flex-col items-center justify-center px-3 py-1 rounded-full transition-colors"
           style={{ color: "var(--color-on-surface-variant)" }}
         >
           <span className="material-symbols-outlined">history</span>
-          <span className="mt-1 font-semibold" style={{ fontSize: "12px" }}>History</span>
+          <span className="mt-1 font-semibold" style={{ fontSize: "11px" }}>Riwayat</span>
         </Link>
-        <Link href="/dashboard/profile" className="flex flex-col items-center justify-center px-4 py-1 rounded-full transition-colors"
+        <Link href="/dashboard/analytics" className="flex flex-col items-center justify-center px-3 py-1 rounded-full transition-colors"
+          style={{ color: "var(--color-on-surface-variant)" }}
+        >
+          <span className="material-symbols-outlined">monitoring</span>
+          <span className="mt-1 font-semibold" style={{ fontSize: "11px" }}>Analitik</span>
+        </Link>
+        <Link href="/dashboard/profile" className="flex flex-col items-center justify-center px-3 py-1 rounded-full transition-colors"
           style={{ color: "var(--color-on-surface-variant)" }}
         >
           <span className="material-symbols-outlined">person</span>
-          <span className="mt-1 font-semibold" style={{ fontSize: "12px" }}>Profile</span>
+          <span className="mt-1 font-semibold" style={{ fontSize: "11px" }}>Profil</span>
         </Link>
       </nav>
     </div>

@@ -290,17 +290,17 @@ export default async function HistoryPage() {
       >
         <Link
           href="/dashboard"
-          className="flex flex-col items-center justify-center rounded-full px-4 py-1"
+          className="flex flex-col items-center justify-center rounded-full px-3 py-1"
           style={{ color: "var(--color-on-surface-variant)" }}
         >
           <span className="material-symbols-outlined">home</span>
-          <span className="mt-1 font-semibold" style={{ fontSize: "12px" }}>
+          <span className="mt-1 font-semibold" style={{ fontSize: "11px" }}>
             Home
           </span>
         </Link>
         <Link
           href="/dashboard/history"
-          className="flex flex-col items-center justify-center rounded-full px-4 py-1"
+          className="flex flex-col items-center justify-center rounded-full px-3 py-1"
           style={{
             backgroundColor: "var(--color-secondary-container)",
             color: "var(--color-on-secondary-container)",
@@ -309,18 +309,28 @@ export default async function HistoryPage() {
           <span className="material-symbols-outlined" style={{ fontVariationSettings: "'FILL' 1" }}>
             history
           </span>
-          <span className="mt-1 font-semibold" style={{ fontSize: "12px" }}>
-            History
+          <span className="mt-1 font-semibold" style={{ fontSize: "11px" }}>
+            Riwayat
+          </span>
+        </Link>
+        <Link
+          href="/dashboard/analytics"
+          className="flex flex-col items-center justify-center rounded-full px-3 py-1"
+          style={{ color: "var(--color-on-surface-variant)" }}
+        >
+          <span className="material-symbols-outlined">monitoring</span>
+          <span className="mt-1 font-semibold" style={{ fontSize: "11px" }}>
+            Analitik
           </span>
         </Link>
         <Link
           href="/dashboard/profile"
-          className="flex flex-col items-center justify-center rounded-full px-4 py-1"
+          className="flex flex-col items-center justify-center rounded-full px-3 py-1"
           style={{ color: "var(--color-on-surface-variant)" }}
         >
           <span className="material-symbols-outlined">person</span>
-          <span className="mt-1 font-semibold" style={{ fontSize: "12px" }}>
-            Profile
+          <span className="mt-1 font-semibold" style={{ fontSize: "11px" }}>
+            Profil
           </span>
         </Link>
       </nav>
