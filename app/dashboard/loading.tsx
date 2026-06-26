@@ -13,7 +13,9 @@ export default function DashboardLoading() {
       <header
         className="w-full top-0 flex justify-between items-center py-4 sticky z-40"
         style={{
-          backgroundColor: "var(--color-background)",
+          backgroundColor: "var(--color-header-bg)",
+          backdropFilter: "blur(12px)",
+          WebkitBackdropFilter: "blur(12px)",
           paddingLeft: "var(--spacing-lg)",
           paddingRight: "var(--spacing-lg)",
         }}
@@ -34,6 +36,7 @@ export default function DashboardLoading() {
             <div className="h-8 w-20 rounded-full bg-[var(--color-surface-variant)] animate-pulse" />
           </div>
           <div className="w-10 h-10 rounded-full bg-[var(--color-surface-variant)] animate-pulse" />
+          <div className="w-10 h-10 rounded-full bg-[var(--color-surface-variant)] animate-pulse" />
         </div>
       </header>
 
@@ -46,21 +49,17 @@ export default function DashboardLoading() {
         }}
       >
         {/* ── 1. Health Score Card Skeleton ── */}
-        <section
-          className="rounded-3xl p-6 flex flex-col gap-3 relative overflow-hidden"
-          style={{
-            backgroundColor: "var(--color-surface-container)",
-            boxShadow: "var(--shadow-card)",
-          }}
-        >
-          <div className="h-4 w-40 rounded bg-[var(--color-surface-variant)] animate-pulse" />
-          <div className="flex items-end gap-3 my-2">
-            <div className="h-10 w-16 rounded bg-[var(--color-surface-variant)] animate-pulse" />
-            <div className="h-6 w-24 rounded bg-[var(--color-surface-variant)] animate-pulse" />
+        <section className="clinical-card p-6 flex flex-col gap-5">
+          <div className="flex items-start justify-between gap-4">
+            <div className="flex flex-col gap-3">
+              <div className="h-3 w-24 rounded bg-[var(--color-surface-variant)] animate-pulse" />
+              <div className="h-14 w-24 rounded bg-[var(--color-surface-variant)] animate-pulse" />
+              <div className="h-4 w-20 rounded bg-[var(--color-surface-variant)] animate-pulse" />
+            </div>
+            <div className="h-14 w-40 rounded-xl bg-[var(--color-surface-variant)] animate-pulse" />
           </div>
-          <div className="h-2 w-full rounded bg-[var(--color-surface-variant)] overflow-hidden">
-            <div className="h-full bg-[var(--color-outline-variant)] animate-pulse" style={{ width: "40%" }} />
-          </div>
+          <div className="hairline" />
+          <div className="h-4 w-48 rounded bg-[var(--color-surface-variant)] animate-pulse" />
         </section>
 
         {/* ── 2. Aktivitas Hari Ini (Timeline) Skeleton ── */}
@@ -75,8 +74,8 @@ export default function DashboardLoading() {
               <div key={i} className="flex gap-4">
                 <div className="w-10 h-10 rounded-full bg-[var(--color-surface-variant)] animate-pulse shrink-0" />
                 <div
-                  className="flex-1 rounded-2xl p-4 flex flex-col gap-2"
-                  style={{ backgroundColor: "var(--color-surface-container)" }}
+                  className="flex-1 rounded-lg p-4 flex flex-col gap-2 border"
+                  style={{ backgroundColor: "var(--color-surface-bright)", borderColor: "var(--color-outline-variant)" }}
                 >
                   <div className="flex justify-between items-start">
                     <div className="h-4 w-28 rounded bg-[var(--color-surface-variant)] animate-pulse" />
@@ -91,28 +90,17 @@ export default function DashboardLoading() {
 
         {/* ── 3. Pemicu Teratas Section Skeleton ── */}
         <section className="flex flex-col gap-3">
-          <div className="h-4 w-36 rounded bg-[var(--color-surface-variant)] animate-pulse" />
+          <div className="h-3 w-36 rounded bg-[var(--color-surface-variant)] animate-pulse" />
           <div className="flex gap-3 overflow-x-auto pb-2">
             {[1, 2, 3].map((i) => (
               <div
                 key={i}
-                className="px-4 h-12 rounded-full bg-[var(--color-surface-container)] flex items-center gap-2 border border-[var(--color-outline-variant)] animate-pulse shrink-0 w-32"
+                className="px-4 h-11 rounded-full bg-[var(--color-surface-bright)] flex items-center gap-2 border border-[var(--color-outline-variant)] animate-pulse shrink-0 w-32"
               />
             ))}
           </div>
         </section>
       </main>
-
-      {/* ── BottomNavBar (Mobile Only) ── */}
-      <nav
-        className="fixed bottom-0 left-0 w-full z-50 flex justify-around items-center px-4 pb-4 pt-2 shadow-sm rounded-t-xl md:hidden"
-        style={{ backgroundColor: "var(--color-surface-container-lowest)" }}
-      >
-        <div className="flex flex-col items-center justify-center px-3 py-1 rounded-full w-12 h-10 bg-[var(--color-surface-variant)] animate-pulse" />
-        <div className="flex flex-col items-center justify-center px-3 py-1 rounded-full w-12 h-10 bg-[var(--color-surface-variant)] animate-pulse" />
-        <div className="flex flex-col items-center justify-center px-3 py-1 rounded-full w-12 h-10 bg-[var(--color-surface-variant)] animate-pulse" />
-        <div className="flex flex-col items-center justify-center px-3 py-1 rounded-full w-12 h-10 bg-[var(--color-surface-variant)] animate-pulse" />
-      </nav>
     </div>
   );
 }

@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useTransition } from "react";
+import { useState, useTransition, useEffect } from "react";
 import { getAnalyticsData } from "./actions";
 import Link from "next/link";
 
@@ -29,6 +29,12 @@ export default function AnalyticsCharts({ initialData }: AnalyticsChartsProps) {
   const [data, setData] = useState(initialData);
   const [period, setPeriod] = useState(initialData.period);
   const [isPending, startTransition] = useTransition();
+
+  // Sinkronisasi state lokal saat prop dari server component berubah (setelah revalidasi)
+  useEffect(() => {
+    setData(initialData);
+    setPeriod(initialData.period);
+  }, [initialData]);
 
   const handlePeriodChange = (newPeriod: number) => {
     if (newPeriod === period || isPending) return;
@@ -304,7 +310,7 @@ export default function AnalyticsCharts({ initialData }: AnalyticsChartsProps) {
                   // Determine color based on average severity
                   let severityColor = "var(--color-primary)";
                   if (symptom.avgSeverity >= 7) severityColor = "var(--color-error)";
-                  else if (symptom.avgSeverity >= 4) severityColor = "#eab308"; // yellow-500
+                  else if (symptom.avgSeverity >= 4) severityColor = "var(--color-warning)";
 
                   return (
                     <div key={idx} className="flex flex-col gap-1.5">
@@ -431,12 +437,12 @@ export default function AnalyticsCharts({ initialData }: AnalyticsChartsProps) {
                       </p>
                     </div>
                     <span
-                      className={`px-3 py-1 rounded-full text-[10px] font-bold shrink-0 ${
+                      className={`risk-badge shrink-0 ${
                         food.gerdRiskLevel === "LOW"
-                          ? "bg-[rgba(163,177,138,0.2)] text-[var(--color-primary)]"
+                          ? "risk-badge-low"
                           : food.gerdRiskLevel === "MEDIUM"
-                          ? "bg-[rgba(234,179,8,0.15)] text-[#ca8a04]"
-                          : "bg-red-100 text-red-700"
+                          ? "risk-badge-medium"
+                          : "risk-badge-high"
                       }`}
                     >
                       {food.gerdRiskLevel === "LOW"

@@ -141,6 +141,11 @@ export async function createJournalEntry(data: JournalFormData) {
   // Hitung ulang skor harian dari seluruh data hari ini.
   await recalcDailyScore(dailyLog.id);
 
+  revalidatePath("/dashboard");
+  revalidatePath("/dashboard/history");
+  revalidatePath("/dashboard/analytics");
+  revalidatePath("/dashboard/profile");
+
   redirect("/dashboard");
 }
 
@@ -193,6 +198,8 @@ export async function deleteMealLog(mealLogId: string) {
 
   revalidatePath("/dashboard");
   revalidatePath("/dashboard/history");
+  revalidatePath("/dashboard/analytics");
+  revalidatePath("/dashboard/profile");
   return { success: true };
 }
 
@@ -214,6 +221,8 @@ export async function deleteSymptomLog(symptomLogId: string) {
 
   revalidatePath("/dashboard");
   revalidatePath("/dashboard/history");
+  revalidatePath("/dashboard/analytics");
+  revalidatePath("/dashboard/profile");
   return { success: true };
 }
 

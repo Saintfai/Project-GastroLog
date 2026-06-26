@@ -1,57 +1,71 @@
 @import "tailwindcss";
 
+/* Enable class-based dark mode for Tailwind v4 (`dark:` utilities). */
+@custom-variant dark (&:where(.dark, .dark *));
+
 /* ============================================================
-   GastroLog Design System — Serene Digestive Care
-   Source: DESIGN.md / Stitch project "GastroLog Smart Reflux Journal"
+   GastroLog Design System — Clean Clinical
+   Minimalist, data-forward, single sage accent, hairline lines.
+   Light + Dark themes share token names; only values swap.
    ============================================================ */
 
 :root {
-  /* ── Primary ──────────────────────────────────────── */
-  --color-primary:                    #566342;
+  /* ── Primary (single accent) ────────────────────────── */
+  --color-primary:                    #4f6037;
   --color-on-primary:                 #ffffff;
-  --color-primary-container:          #a3b18a;
-  --color-on-primary-container:       #384425;
-  --color-inverse-primary:            #becca3;
+  --color-primary-container:          #cdd9b4;
+  --color-on-primary-container:       #36421f;
+  --color-inverse-primary:            #b1c193;
 
   /* ── Secondary ──────────────────────────────────────── */
   --color-secondary:                  #57615c;
   --color-on-secondary:               #ffffff;
-  --color-secondary-container:        #dbe5df;
-  --color-on-secondary-container:     #5d6762;
+  --color-secondary-container:        #e6ece4;
+  --color-on-secondary-container:     #424a44;
 
   /* ── Tertiary ───────────────────────────────────────── */
   --color-tertiary:                   #605e5a;
   --color-on-tertiary:                #ffffff;
-  --color-tertiary-container:         #aeaba7;
+  --color-tertiary-container:         #e8e6e1;
   --color-on-tertiary-container:      #41403c;
 
-  /* ── Surface ────────────────────────────────────────── */
-  --color-background:                 #f7faf5;
-  --color-on-background:              #191c1a;
-  --color-surface:                    #f7faf5;
-  --color-surface-dim:                #d8dbd6;
-  --color-surface-bright:             #f7faf5;
+  /* ── Surface ─── clean clinical: bright, low-contrast ─── */
+  --color-background:                 #fbfcfa;
+  --color-on-background:              #1a1c19;
+  --color-surface:                    #fbfcfa;
+  --color-surface-dim:                #dfe2db;
+  --color-surface-bright:             #ffffff;
   --color-surface-container-lowest:   #ffffff;
-  --color-surface-container-low:      #f1f4f0;
-  --color-surface-container:          #ecefea;
-  --color-surface-container-high:     #e6e9e4;
-  --color-surface-container-highest:  #e0e3df;
-  --color-surface-variant:            #e0e3df;
-  --color-surface-tint:               #566342;
-  --color-on-surface:                 #191c1a;
-  --color-on-surface-variant:         #45483f;
-  --color-inverse-surface:            #2d312e;
-  --color-inverse-on-surface:         #eff2ed;
+  --color-surface-container-low:      #f5f6f2;
+  --color-surface-container:          #f1f3ed;
+  --color-surface-container-high:     #ebede6;
+  --color-surface-container-highest:  #e5e8e0;
+  --color-surface-variant:            #e4e7de;
+  --color-surface-tint:               #4f6037;
+  --color-on-surface:                 #1a1c19;
+  --color-on-surface-variant:         #43483e;
+  --color-inverse-surface:            #2f312d;
+  --color-inverse-on-surface:         #f0f2ec;
 
-  /* ── Outline ─────────────────────────────────────────── */
-  --color-outline:                    #76786e;
-  --color-outline-variant:            #c6c8bb;
+  /* ── Outline (hairlines) ────────────────────────────── */
+  --color-outline:                    #73796b;
+  --color-outline-variant:            #e2e5db;
 
   /* ── Error ───────────────────────────────────────────── */
   --color-error:                      #ba1a1a;
   --color-on-error:                   #ffffff;
   --color-error-container:            #ffdad6;
   --color-on-error-container:         #93000a;
+
+  /* ── Semantic chart/severity accents (theme-aware) ───── */
+  --color-warning:                    #c98a04;
+  --color-success:                    #4f6037;
+  --color-risk-low-bg:                #e4ecd4;
+  --color-risk-low-fg:                #36421f;
+  --color-risk-medium-bg:             #fbf0cf;
+  --color-risk-medium-fg:             #8a6204;
+  --color-risk-high-bg:               #ffdad6;
+  --color-risk-high-fg:               #93000a;
 
   /* ── Typography ──────────────────────────────────────── */
   --font-sans: 'Inter', sans-serif;
@@ -62,6 +76,7 @@
   --radius-md:      0.75rem;
   --radius-lg:      1rem;
   --radius-xl:      1.5rem;
+  --radius-2xl:     1.75rem;
   --radius-full:    9999px;
 
   /* ── Spacing ─────────────────────────────────────────── */
@@ -77,14 +92,86 @@
   --page-margin-mobile:      20px;
   --page-margin-desktop:     40px;
 
-  /* ── Elevation ───────────────────────────────────────── */
-  --shadow-card: 0px 4px 20px rgba(45, 49, 46, 0.06);
-  --shadow-card-hover: 0px 8px 32px rgba(45, 49, 46, 0.10);
+  /* ── Elevation (very soft, clinical) ─────────────────── */
+  --shadow-card: 0px 1px 2px rgba(26, 28, 25, 0.04), 0px 4px 16px rgba(26, 28, 25, 0.03);
+  --shadow-card-hover: 0px 2px 6px rgba(26, 28, 25, 0.06), 0px 10px 28px rgba(26, 28, 25, 0.06);
+
+  /* ── Theme-aware translucent layers (headers, scrims) ── */
+  --color-header-bg:        rgba(251, 252, 250, 0.8);
+  --color-scrim:            rgba(26, 28, 25, 0.4);
+  --color-accent-soft:      rgba(79, 96, 55, 0.10);
+}
+
+/* ── Dark theme ──────────────────────────────────────────── */
+:root.dark {
+  --color-primary:                    #b1c193;
+  --color-on-primary:                 #233405;
+  --color-primary-container:          #394924;
+  --color-on-primary-container:       #cdd9b4;
+  --color-inverse-primary:            #4f6037;
+
+  --color-secondary:                  #c2cabf;
+  --color-on-secondary:               #2c322c;
+  --color-secondary-container:        #2f3a33;
+  --color-on-secondary-container:     #d9e3d8;
+
+  --color-tertiary:                   #c8c6c1;
+  --color-on-tertiary:                #303030;
+  --color-tertiary-container:         #3a3a36;
+  --color-on-tertiary-container:      #e5e3de;
+
+  --color-background:                 #11140f;
+  --color-on-background:              #e2e4dc;
+  --color-surface:                    #11140f;
+  --color-surface-dim:                #11140f;
+  --color-surface-bright:             #373a33;
+  --color-surface-container-lowest:   #0c0f0a;
+  --color-surface-container-low:      #1a1d17;
+  --color-surface-container:          #1e211b;
+  --color-surface-container-high:     #282c25;
+  --color-surface-container-highest:  #33372f;
+  --color-surface-variant:            #43483d;
+  --color-surface-tint:               #b1c193;
+  --color-on-surface:                 #e2e4dc;
+  --color-on-surface-variant:         #c3c8b9;
+  --color-inverse-surface:            #e2e4dc;
+  --color-inverse-on-surface:         #2f312d;
+
+  --color-outline:                    #8d9384;
+  --color-outline-variant:            #2b2f27;
+
+  --color-error:                      #ffb4ab;
+  --color-on-error:                   #690005;
+  --color-error-container:            #5a1a18;
+  --color-on-error-container:         #ffdad6;
+
+  --color-warning:                    #e7c26b;
+  --color-success:                    #b1c193;
+  --color-risk-low-bg:                #2f3a23;
+  --color-risk-low-fg:                #c9d8a8;
+  --color-risk-medium-bg:             #41370f;
+  --color-risk-medium-fg:             #f0d28a;
+  --color-risk-high-bg:               #5a1a18;
+  --color-risk-high-fg:               #ffdad6;
+
+  --shadow-card: 0px 1px 2px rgba(0, 0, 0, 0.4), 0px 4px 16px rgba(0, 0, 0, 0.3);
+  --shadow-card-hover: 0px 2px 6px rgba(0, 0, 0, 0.5), 0px 10px 28px rgba(0, 0, 0, 0.45);
+
+  --color-header-bg:        rgba(17, 20, 15, 0.8);
+  --color-scrim:            rgba(0, 0, 0, 0.6);
+  --color-accent-soft:      rgba(177, 193, 147, 0.14);
 }
 
 /* ── Base Reset ──────────────────────────────────────────── */
 *, *::before, *::after {
   box-sizing: border-box;
+}
+
+html {
+  color-scheme: light;
+}
+html.dark {
+  color-scheme: dark;
 }
 
 body {
@@ -93,6 +180,21 @@ body {
   font-family: var(--font-sans);
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
+}
+
+/* Smooth, scoped theme transition (avoid transitioning transforms). */
+body,
+.clinical-card,
+.log-card,
+.analytics-card,
+.stat-mini-card,
+.chip,
+.chip-selectable,
+.portion-pill {
+  transition: background-color 300ms ease, border-color 300ms ease, color 300ms ease, box-shadow 300ms ease;
+}
+@media (prefers-reduced-motion: reduce) {
+  * { transition: none !important; animation: none !important; }
 }
 
 /* ── Login Page Animations ───────────────────────────────── */
@@ -219,7 +321,7 @@ body {
   align-items: center;
   padding: 6px 14px;
   background-color: var(--color-surface-container);
-  border: 1.5px solid var(--color-outline-variant);
+  border: 1px solid var(--color-outline-variant);
   border-radius: var(--radius-full);
   font-size: 13px;
   font-weight: 500;
@@ -234,8 +336,8 @@ body {
   justify-content: center;
   padding: 8px 18px;
   min-height: var(--touch-target-min);
-  background-color: var(--color-surface-container);
-  border: 1.5px solid var(--color-outline-variant);
+  background-color: var(--color-surface-container-low);
+  border: 1px solid var(--color-outline-variant);
   border-radius: var(--radius-full);
   font-size: 14px;
   font-weight: 500;
@@ -370,16 +472,16 @@ body {
   text-transform: uppercase;
 }
 .risk-badge-low {
-  background-color: #dae8be;
-  color: #384425;
+  background-color: var(--color-risk-low-bg);
+  color: var(--color-risk-low-fg);
 }
 .risk-badge-medium {
-  background-color: #fff3cd;
-  color: #856404;
+  background-color: var(--color-risk-medium-bg);
+  color: var(--color-risk-medium-fg);
 }
 .risk-badge-high {
-  background-color: var(--color-error-container);
-  color: var(--color-on-error-container);
+  background-color: var(--color-risk-high-bg);
+  color: var(--color-risk-high-fg);
 }
 
 /* ── Emoji Button ───────────────────────────────────────── */
@@ -479,18 +581,38 @@ body {
   box-shadow: 0 2px 8px rgba(45, 49, 46, 0.06);
 }
 
+/* ── Clean Clinical surfaces ────────────────────────────── */
+.clinical-card {
+  background-color: var(--color-surface-bright);
+  border: 1px solid var(--color-outline-variant);
+  border-radius: var(--radius-2xl);
+  box-shadow: var(--shadow-card);
+}
+.hairline {
+  height: 1px;
+  width: 100%;
+  background-color: var(--color-outline-variant);
+}
+.stat-number {
+  font-variant-numeric: tabular-nums;
+  letter-spacing: -0.03em;
+  line-height: 1;
+}
+
 /* ── Dashboard Cards & Timeline ─────────────────────────── */
 .log-card {
-  background-color: var(--color-surface-container);
-  border-radius: var(--radius-xl);
-  padding: 20px;
+  background-color: var(--color-surface-bright);
+  border: 1px solid var(--color-outline-variant);
+  border-radius: var(--radius-lg);
+  padding: 16px 18px;
   box-shadow: none;
-  transition: box-shadow 200ms ease;
+  transition: box-shadow 200ms ease, border-color 200ms ease, transform 200ms ease;
   position: relative;
   z-index: 10;
 }
 .log-card:hover {
   box-shadow: var(--shadow-card);
+  border-color: var(--color-primary-container);
 }
 
 .timeline-connector {
@@ -529,24 +651,24 @@ body {
   padding: 40px 20px;
   text-align: center;
   color: var(--color-on-surface-variant);
-  border: 1.5px dashed var(--color-outline-variant);
+  border: 1px dashed var(--color-outline-variant);
   border-radius: var(--radius-xl);
-  background-color: rgba(247, 250, 245, 0.5);
+  background-color: var(--color-surface-container-low);
 }
 
 /* ── Analytics & Charts ─────────────────────────────────── */
 .analytics-card {
-  background-color: var(--color-surface-container);
+  background-color: var(--color-surface-bright);
   border-radius: var(--radius-2xl);
   padding: var(--spacing-lg);
   box-shadow: var(--shadow-card);
   transition: all 250ms cubic-bezier(0.4, 0, 0.2, 1);
-  border: 1px solid rgba(163, 177, 138, 0.08);
+  border: 1px solid var(--color-outline-variant);
 }
 .analytics-card:hover {
   transform: translateY(-2px);
   box-shadow: var(--shadow-card-hover);
-  border-color: rgba(163, 177, 138, 0.2);
+  border-color: var(--color-primary-container);
 }
 
 .stat-mini-card {
@@ -558,6 +680,7 @@ body {
 }
 .stat-mini-card:hover {
   background-color: var(--color-surface-container-high);
+  border-color: var(--color-primary-container);
 }
 
 .chart-bar-bg {

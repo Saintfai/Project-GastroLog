@@ -185,9 +185,10 @@ export default function JournalFormPage() {
       <header
         className="fixed top-0 w-full z-50 flex items-center h-[72px]"
         style={{
-          backgroundColor: "rgba(247, 250, 245, 0.9)",
+          backgroundColor: "var(--color-header-bg)",
           backdropFilter: "blur(12px)",
           WebkitBackdropFilter: "blur(12px)",
+          borderBottom: "1px solid var(--color-outline-variant)",
           paddingLeft: "var(--spacing-lg)",
           paddingRight: "var(--spacing-lg)",
         }}
@@ -352,9 +353,10 @@ export default function JournalFormPage() {
             <div
               className="flex items-center gap-2 px-3 py-2 rounded-lg"
               style={{
-                backgroundColor: "var(--color-primary-fixed)",
+                backgroundColor: "var(--color-accent-soft)",
                 fontSize: "13px",
-                color: "var(--color-on-primary-fixed)",
+                color: "var(--color-primary)",
+                fontWeight: 600,
               }}
             >
               <span className="material-symbols-outlined" style={{ fontSize: "16px" }}>
@@ -444,10 +446,10 @@ export default function JournalFormPage() {
               className="flex items-center justify-center"
               style={{
                 fontSize: "24px",
-                fontWeight: 500,
+                fontWeight: 600,
                 lineHeight: "32px",
                 color: "var(--color-primary)",
-                backgroundColor: "rgba(218, 232, 190, 0.3)",
+                backgroundColor: "var(--color-accent-soft)",
                 padding: "4px 12px",
                 borderRadius: "var(--radius-default)",
                 minWidth: "48px",

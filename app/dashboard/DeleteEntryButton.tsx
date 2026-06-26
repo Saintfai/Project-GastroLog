@@ -47,7 +47,7 @@ export default function DeleteEntryButton({ id, type, label }: Props) {
       {confirming && (
         <div
           className="fixed inset-0 z-[60] flex items-end justify-center sm:items-center"
-          style={{ backgroundColor: "rgba(45, 49, 46, 0.4)" }}
+          style={{ backgroundColor: "var(--color-scrim)", backdropFilter: "blur(2px)" }}
           onClick={() => !isPending && setConfirming(false)}
         >
           <div

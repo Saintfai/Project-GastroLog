@@ -3,6 +3,8 @@ import { auth } from "@/auth";
 import { redirect } from "next/navigation";
 import prisma from "@/lib/prisma";
 import DeleteEntryButton from "./DeleteEntryButton";
+import { DesktopNavLinks } from "./DashboardNav";
+import ThemeToggle from "../ThemeToggle";
 
 export default async function DashboardPage() {
   const session = await auth();
@@ -31,7 +33,7 @@ export default async function DashboardPage() {
   sevenDaysAgo.setDate(sevenDaysAgo.getDate() - 7);
 
   // Fetch Today's Log & High Symptom Logs (Last 7 days) in parallel
-  const [todayLog, highSymptomLogs] = await Promise.all([
+  const [todayLog, highSymptomLogs, recentLogs] = await Promise.all([
     prisma.dailyLog.findUnique({
       where: {
         userId_logDate: {
@@ -57,7 +59,26 @@ export default async function DashboardPage() {
       },
       select: { dailyLogId: true },
     }),
+    prisma.dailyLog.findMany({
+      where: { userId: user.id, logDate: { gte: sevenDaysAgo } },
+      select: { logDate: true, overallScore: true },
+      orderBy: { logDate: "asc" },
+    }),
   ]);
+
+  // Build a 7-day sparkline series (oldest → today), null where no log exists.
+  const scoreByDay = new Map(
+    recentLogs.map((l) => [
+      new Date(l.logDate.getFullYear(), l.logDate.getMonth(), l.logDate.getDate()).getTime(),
+      l.overallScore,
+    ])
+  );
+  const sparkline: { score: number | null; isToday: boolean }[] = [];
+  for (let i = 6; i >= 0; i--) {
+    const d = new Date(startOfToday);
+    d.setDate(d.getDate() - i);
+    sparkline.push({ score: scoreByDay.get(d.getTime()) ?? null, isToday: i === 0 });
+  }
 
   // Combine and sort today's activities (meals and symptoms)
   type TimelineItem = 
@@ -88,7 +109,6 @@ export default async function DashboardPage() {
   }
 
   const triggerDailyLogIds = Array.from(new Set(highSymptomLogs.map(s => s.dailyLogId)));
-  
   let topTriggers: { foodName: string; count: number }[] = [];
   if (triggerDailyLogIds.length > 0) {
     const triggerMeals = await prisma.mealLog.findMany({
@@ -107,6 +127,30 @@ export default async function DashboardPage() {
       .map(([foodName, count]) => ({ foodName, count }));
   }
 
+  // ── Sparkline geometry (7 days) ──
+  const sparkW = 240;
+  const sparkH = 56;
+  const sparkPad = 6;
+  const sparkPoints = sparkline.map((d, i) => {
+    const x = sparkPad + (i / (sparkline.length - 1)) * (sparkW - sparkPad * 2);
+    const y =
+      d.score === null
+        ? null
+        : sparkPad + (sparkH - sparkPad * 2) - (d.score / 10) * (sparkH - sparkPad * 2);
+    return { x, y, score: d.score, isToday: d.isToday };
+  });
+  let sparkPath = "";
+  let sparkStarted = false;
+  for (const p of sparkPoints) {
+    if (p.y === null) continue;
+    sparkPath += sparkStarted ? ` L ${p.x} ${p.y}` : `M ${p.x} ${p.y}`;
+    sparkStarted = true;
+  }
+  const hasSparkData = sparkPoints.some((p) => p.y !== null);
+
+  const mealCount = todayLog?.meals.length ?? 0;
+  const symptomCount = todayLog?.symptoms.length ?? 0;
+
   return (
     <div 
       className="min-h-screen antialiased pb-28 md:pb-0"
@@ -117,21 +161,23 @@ export default async function DashboardPage() {
     >
       {/* ── TopAppBar ── */}
       <header className="w-full top-0 flex justify-between items-center py-4 sticky z-40"
-        style={{ 
-          backgroundColor: "var(--color-background)",
-          paddingLeft: "var(--spacing-lg)", 
-          paddingRight: "var(--spacing-lg)" 
+        style={{
+          backgroundColor: "var(--color-header-bg)",
+          backdropFilter: "blur(12px)",
+          WebkitBackdropFilter: "blur(12px)",
+          paddingLeft: "var(--spacing-lg)",
+          paddingRight: "var(--spacing-lg)"
         }}
       >
-        <Link 
-          href="/dashboard/profile" 
+        <Link
+          href="/dashboard/profile"
           className="flex items-center gap-3 group px-3 py-1.5 rounded-2xl hover:bg-[var(--color-surface-container-low)] active:scale-[0.98] transition-all"
         >
           {image ? (
-            <img 
-              src={image} 
-              alt={`Foto profil ${name}`} 
-              className="w-10 h-10 rounded-full object-cover shadow-sm group-hover:ring-2 group-hover:ring-[var(--color-primary-container)] transition-all" 
+            <img
+              src={image}
+              alt={`Foto profil ${name}`}
+              className="w-10 h-10 rounded-full object-cover shadow-sm group-hover:ring-2 group-hover:ring-[var(--color-primary-container)] transition-all"
               referrerPolicy="no-referrer"
             />
           ) : (
@@ -142,7 +188,7 @@ export default async function DashboardPage() {
             </div>
           )}
           <div>
-            <h1 className="font-bold flex items-center gap-0.5" style={{ fontSize: "24px", lineHeight: "30px", letterSpacing: "-0.02em", color: "var(--color-primary)" }}>
+            <h1 className="font-bold flex items-center gap-0.5" style={{ fontSize: "22px", lineHeight: "28px", letterSpacing: "-0.03em", color: "var(--color-on-surface)" }}>
               GastroLog
               <span className="material-symbols-outlined opacity-0 group-hover:opacity-100 transition-all duration-200 transform translate-x-[-4px] group-hover:translate-x-0" style={{ fontSize: "18px" }}>chevron_right</span>
             </h1>
@@ -153,36 +199,14 @@ export default async function DashboardPage() {
         </Link>
         <div className="flex items-center gap-2">
           {/* Desktop Navigation Links */}
-          <div className="hidden md:flex items-center gap-1 mr-4">
-            <Link 
-              href="/dashboard" 
-              className="px-4 py-2 rounded-full text-sm font-semibold text-[var(--color-on-primary-container)] bg-[var(--color-primary-container)] transition-all"
-            >
-              Beranda
-            </Link>
-            <Link 
-              href="/dashboard/history" 
-              className="px-4 py-2 rounded-full text-sm font-semibold text-[var(--color-on-surface-variant)] hover:bg-[var(--color-surface-container-low)] hover:text-[var(--color-primary)] transition-all"
-            >
-              Riwayat
-            </Link>
-            <Link 
-              href="/dashboard/analytics" 
-              className="px-4 py-2 rounded-full text-sm font-semibold text-[var(--color-on-surface-variant)] hover:bg-[var(--color-surface-container-low)] hover:text-[var(--color-primary)] transition-all"
-            >
-              Analitik
-            </Link>
-            <Link 
-              href="/dashboard/profile" 
-              className="px-4 py-2 rounded-full text-sm font-semibold text-[var(--color-on-surface-variant)] hover:bg-[var(--color-surface-container-low)] hover:text-[var(--color-primary)] transition-all"
-            >
-              Profil
-            </Link>
+          <div className="mr-2">
+            <DesktopNavLinks />
           </div>
-          <button className="flex items-center justify-center rounded-full transition-colors hover:bg-[var(--color-surface-container-low)]"
+          <ThemeToggle />
+          <button className="flex items-center justify-center rounded-full transition-colors hover:bg-[var(--color-surface-container-high)]"
             style={{ width: "var(--touch-target-min)", height: "var(--touch-target-min)" }}
           >
-            <span className="material-symbols-outlined" style={{ color: "var(--color-primary)" }}>notifications</span>
+            <span className="material-symbols-outlined" style={{ color: "var(--color-on-surface-variant)" }}>notifications</span>
           </button>
         </div>
       </header>
@@ -195,49 +219,78 @@ export default async function DashboardPage() {
         }}
       >
         {/* ── 1. Health Score Card ── */}
-        <section className="rounded-3xl p-6 flex flex-col gap-3 relative overflow-hidden"
-          style={{ 
-            backgroundColor: "var(--color-surface-container)", 
-            boxShadow: "var(--shadow-card)" 
-          }}
-        >
-          {/* Decorative background element */}
-          <div className="absolute -right-8 -top-8 w-32 h-32 rounded-full opacity-20 blur-2xl pointer-events-none"
-            style={{ backgroundColor: "var(--color-primary-container)" }}
-          />
-          <h2 style={{ fontSize: "16px", color: "var(--color-on-surface-variant)" }}>Skor Kesehatan Hari Ini</h2>
-          
-          <div className="flex items-end gap-3">
-            <div className="flex items-baseline gap-1">
-              <span className="font-bold" style={{ fontSize: "40px", lineHeight: 1, color: "var(--color-primary)" }}>
-                {score > 0 ? score : "--"}
-              </span>
-              <span style={{ fontSize: "18px", color: "var(--color-on-surface-variant)" }}>/10</span>
+        <section className="clinical-card p-6 flex flex-col gap-5">
+          <div className="flex items-start justify-between gap-4">
+            <div className="flex flex-col gap-3">
+              <h2 style={{ fontSize: "12px", fontWeight: 700, letterSpacing: "0.08em", textTransform: "uppercase", color: "var(--color-on-surface-variant)" }}>
+                Skor Hari Ini
+              </h2>
+              <div className="flex items-baseline gap-1">
+                <span className="stat-number font-bold" style={{ fontSize: "56px", color: "var(--color-on-surface)" }}>
+                  {score > 0 ? score : "--"}
+                </span>
+                <span className="stat-number" style={{ fontSize: "20px", fontWeight: 600, color: "var(--color-on-surface-variant)" }}>/10</span>
+              </div>
+              <div className="flex items-center gap-2">
+                <span style={{ width: "8px", height: "8px", borderRadius: "9999px", backgroundColor: score > 0 ? "var(--color-primary)" : "var(--color-outline-variant)" }} />
+                <span style={{ fontSize: "14px", fontWeight: 600, color: score > 0 ? "var(--color-primary)" : "var(--color-on-surface-variant)" }}>
+                  {scoreLabel}
+                </span>
+              </div>
             </div>
-            <div className="mb-1.5 px-3 py-1 rounded-lg" style={{ backgroundColor: "rgba(163, 177, 138, 0.2)", color: "var(--color-primary)", fontSize: "13px", fontWeight: 600 }}>
-              {scoreLabel}
+
+            {/* 7-day sparkline */}
+            <div className="flex flex-col items-end gap-2 shrink-0">
+              <span style={{ fontSize: "11px", fontWeight: 600, color: "var(--color-on-surface-variant)" }}>7 hari terakhir</span>
+              <svg width={sparkW} height={sparkH} viewBox={`0 0 ${sparkW} ${sparkH}`} className="max-w-[200px] sm:max-w-[240px] w-full h-auto overflow-visible">
+                {hasSparkData ? (
+                  <>
+                    {sparkPath && (
+                      <path d={sparkPath} fill="none" stroke="var(--color-primary)" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
+                    )}
+                    {sparkPoints.map((p, i) =>
+                      p.y === null ? null : (
+                        <circle
+                          key={i}
+                          cx={p.x}
+                          cy={p.y}
+                          r={p.isToday ? 4 : 2.5}
+                          fill={p.isToday ? "var(--color-primary)" : "var(--color-surface-bright)"}
+                          stroke="var(--color-primary)"
+                          strokeWidth={p.isToday ? 0 : 1.5}
+                        />
+                      )
+                    )}
+                  </>
+                ) : (
+                  <line x1={sparkPad} y1={sparkH / 2} x2={sparkW - sparkPad} y2={sparkH / 2} stroke="var(--color-outline-variant)" strokeWidth="1.5" strokeDasharray="3 4" />
+                )}
+              </svg>
             </div>
           </div>
 
-          <div className="score-progress-track mt-1">
-            <div 
-              className="score-progress-fill" 
-              style={{ width: `${score > 0 ? (score / 10) * 100 : 0}%` }}
-            />
+          <div className="hairline" />
+
+          <div className="flex items-center gap-5" style={{ fontSize: "13px", color: "var(--color-on-surface-variant)" }}>
+            <span className="flex items-center gap-1.5">
+              <span className="material-symbols-outlined" style={{ fontSize: "18px", color: "var(--color-primary)" }}>restaurant</span>
+              {mealCount} makan
+            </span>
+            <span className="flex items-center gap-1.5">
+              <span className="material-symbols-outlined" style={{ fontSize: "18px", color: symptomCount > 0 ? "var(--color-error)" : "var(--color-primary)" }}>monitor_heart</span>
+              {symptomCount} gejala
+            </span>
+            {score === 0 && (
+              <span className="ml-auto" style={{ fontSize: "12px" }}>Isi jurnal untuk melihat skor.</span>
+            )}
           </div>
-          
-          {score === 0 && (
-            <p className="mt-1" style={{ fontSize: "12px", color: "var(--color-on-surface-variant)" }}>
-              Isi jurnal hari ini untuk melihat skor kesehatanmu.
-            </p>
-          )}
         </section>
 
         {/* ── 2. Aktivitas Hari Ini (Timeline) ── */}
         <section className="flex flex-col gap-4">
           <div className="flex justify-between items-center">
-            <h2 className="font-medium" style={{ fontSize: "18px", color: "var(--color-on-surface)" }}>Aktivitas Hari Ini</h2>
-            <Link href="/dashboard/history" style={{ fontSize: "14px", color: "var(--color-primary)", fontWeight: 500 }}>
+            <h2 style={{ fontSize: "12px", fontWeight: 700, letterSpacing: "0.08em", textTransform: "uppercase", color: "var(--color-on-surface-variant)" }}>Aktivitas Hari Ini</h2>
+            <Link href="/dashboard/history" style={{ fontSize: "13px", color: "var(--color-primary)", fontWeight: 600 }}>
               Lihat Semua
             </Link>
           </div>
@@ -306,8 +359,8 @@ export default async function DashboardPage() {
                             className="h-full rounded-full" 
                             style={{ 
                               width: `${(item.data.severity / 10) * 100}%`,
-                              backgroundColor: item.data.severity >= 7 ? "var(--color-error)" : 
-                                             item.data.severity >= 4 ? "#eab308" : "var(--color-primary)"
+                              backgroundColor: item.data.severity >= 7 ? "var(--color-error)" :
+                                             item.data.severity >= 4 ? "var(--color-warning)" : "var(--color-primary)"
                             }}
                           />
                         </div>
@@ -332,28 +385,28 @@ export default async function DashboardPage() {
         {/* ── 3. Pemicu Teratas Section ── */}
         <section className="flex flex-col gap-3">
           <div className="flex items-center gap-2">
-            <h2 className="font-medium" style={{ fontSize: "16px", color: "var(--color-on-surface-variant)" }}>Pemicu Teratas (7 Hari)</h2>
+            <h2 style={{ fontSize: "12px", fontWeight: 700, letterSpacing: "0.08em", textTransform: "uppercase", color: "var(--color-on-surface-variant)" }}>Pemicu Teratas · 7 Hari</h2>
             <span className="material-symbols-outlined" style={{ color: "var(--color-outline)", fontSize: "16px" }}>info</span>
           </div>
-          
-          <div className="flex gap-3 overflow-x-auto pb-2" style={{ scrollbarWidth: "none", msOverflowStyle: "none" } as React.CSSProperties}>
+
+          <div className="flex gap-2 overflow-x-auto pb-2" style={{ scrollbarWidth: "none", msOverflowStyle: "none" } as React.CSSProperties}>
             {topTriggers.length > 0 ? (
               topTriggers.map((trigger, index) => (
-                <div key={index} className="flex items-center gap-2 px-4 h-12 rounded-full shrink-0"
-                  style={{ backgroundColor: "var(--color-surface-container-high)", border: "1px solid var(--color-outline-variant)" }}
+                <div key={index} className="flex items-center gap-2 px-4 h-11 rounded-full shrink-0"
+                  style={{ backgroundColor: "var(--color-surface-bright)", border: "1px solid var(--color-outline-variant)" }}
                 >
                   <span style={{ fontSize: "14px", fontWeight: 500, color: "var(--color-on-surface)" }}>
                     {trigger.foodName}
                   </span>
-                  <span className="flex items-center justify-center rounded-full" 
-                    style={{ backgroundColor: "var(--color-error-container)", color: "var(--color-on-error-container)", width: "20px", height: "20px", fontSize: "11px", fontWeight: 600 }}
+                  <span className="flex items-center justify-center rounded-full stat-number"
+                    style={{ backgroundColor: "var(--color-accent-soft)", color: "var(--color-primary)", minWidth: "20px", height: "20px", padding: "0 6px", fontSize: "11px", fontWeight: 700 }}
                   >
                     {trigger.count}
                   </span>
                 </div>
               ))
             ) : (
-              <div className="flex items-center justify-center h-12 w-full rounded-full"
+              <div className="flex items-center justify-center h-11 w-full rounded-full"
                 style={{ border: "1px dashed var(--color-outline-variant)", color: "var(--color-outline)" }}
               >
                 <span style={{ fontSize: "14px" }}>Belum ada data pemicu yang terdeteksi</span>
@@ -362,50 +415,6 @@ export default async function DashboardPage() {
           </div>
         </section>
       </main>
-
-      {/* ── FAB (Catat Jurnal) ── */}
-      <div className="fixed bottom-24 left-0 w-full flex justify-center z-40 md:bottom-8">
-        <Link href="/dashboard/journal" className="flex items-center gap-2 px-6 py-4 rounded-full active:scale-95 transition-all duration-200 hover:opacity-90"
-          style={{ 
-            backgroundColor: "var(--color-primary)", 
-            color: "var(--color-on-primary)",
-            boxShadow: "var(--shadow-card-hover)" 
-          }}
-        >
-          <span className="material-symbols-outlined" style={{ fontVariationSettings: "'FILL' 1" }}>edit_document</span>
-          <span className="font-medium" style={{ fontSize: "14px" }}>Catat Jurnal</span>
-        </Link>
-      </div>
-
-      {/* ── BottomNavBar (Mobile Only) ── */}
-      <nav className="fixed bottom-0 left-0 w-full z-50 flex justify-around items-center px-4 pb-4 pt-2 shadow-sm rounded-t-xl md:hidden"
-        style={{ backgroundColor: "var(--color-surface-container-lowest)" }}
-      >
-        <Link href="/dashboard" className="flex flex-col items-center justify-center rounded-full px-3 py-1 transition-transform duration-150 active:scale-95"
-          style={{ backgroundColor: "var(--color-secondary-container)", color: "var(--color-on-secondary-container)" }}
-        >
-          <span className="material-symbols-outlined" style={{ fontVariationSettings: "'FILL' 1" }}>home</span>
-          <span className="mt-1 font-semibold" style={{ fontSize: "11px" }}>Home</span>
-        </Link>
-        <Link href="/dashboard/history" className="flex flex-col items-center justify-center px-3 py-1 rounded-full transition-colors"
-          style={{ color: "var(--color-on-surface-variant)" }}
-        >
-          <span className="material-symbols-outlined">history</span>
-          <span className="mt-1 font-semibold" style={{ fontSize: "11px" }}>Riwayat</span>
-        </Link>
-        <Link href="/dashboard/analytics" className="flex flex-col items-center justify-center px-3 py-1 rounded-full transition-colors"
-          style={{ color: "var(--color-on-surface-variant)" }}
-        >
-          <span className="material-symbols-outlined">monitoring</span>
-          <span className="mt-1 font-semibold" style={{ fontSize: "11px" }}>Analitik</span>
-        </Link>
-        <Link href="/dashboard/profile" className="flex flex-col items-center justify-center px-3 py-1 rounded-full transition-colors"
-          style={{ color: "var(--color-on-surface-variant)" }}
-        >
-          <span className="material-symbols-outlined">person</span>
-          <span className="mt-1 font-semibold" style={{ fontSize: "11px" }}>Profil</span>
-        </Link>
-      </nav>
     </div>
   );
 }

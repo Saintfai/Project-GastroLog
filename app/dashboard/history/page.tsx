@@ -2,6 +2,8 @@ import Link from "next/link";
 import { auth } from "@/auth";
 import { redirect } from "next/navigation";
 import prisma from "@/lib/prisma";
+import { DesktopNavLinks } from "../DashboardNav";
+import ThemeToggle from "../../ThemeToggle";
 
 const symptomLabels: Record<string, string> = {
   HEARTBURN: "Heartburn",
@@ -69,35 +71,42 @@ export default async function HistoryPage() {
       }}
     >
       <header
-        className="sticky top-0 z-40 flex h-[72px] items-center"
+        className="sticky top-0 z-40 flex h-[72px] items-center justify-between"
         style={{
-          backgroundColor: "rgba(247, 250, 245, 0.92)",
+          backgroundColor: "var(--color-header-bg)",
           backdropFilter: "blur(12px)",
           WebkitBackdropFilter: "blur(12px)",
+          borderBottom: "1px solid var(--color-outline-variant)",
           paddingLeft: "var(--spacing-lg)",
           paddingRight: "var(--spacing-lg)",
         }}
       >
-        <Link
-          href="/dashboard"
-          className="flex items-center justify-center rounded-full transition-opacity hover:opacity-80 active:scale-95"
-          style={{
-            width: "var(--touch-target-min)",
-            height: "var(--touch-target-min)",
-            color: "var(--color-on-surface)",
-          }}
-        >
-          <span className="material-symbols-outlined" style={{ fontSize: "28px" }}>
-            arrow_back
-          </span>
-        </Link>
-        <div className="ml-2">
-          <h1 style={{ fontSize: "24px", fontWeight: 600, lineHeight: "32px" }}>
-            Riwayat
-          </h1>
-          <p style={{ fontSize: "13px", color: "var(--color-on-surface-variant)" }}>
-            30 catatan terbaru
-          </p>
+        <div className="flex items-center">
+          <Link
+            href="/dashboard"
+            className="flex items-center justify-center rounded-full transition-opacity hover:opacity-80 active:scale-95"
+            style={{
+              width: "var(--touch-target-min)",
+              height: "var(--touch-target-min)",
+              color: "var(--color-on-surface)",
+            }}
+          >
+            <span className="material-symbols-outlined" style={{ fontSize: "28px" }}>
+              arrow_back
+            </span>
+          </Link>
+          <div className="ml-2">
+            <h1 style={{ fontSize: "22px", fontWeight: 700, lineHeight: "28px", letterSpacing: "-0.02em" }}>
+              Riwayat
+            </h1>
+            <p style={{ fontSize: "13px", color: "var(--color-on-surface-variant)" }}>
+              30 catatan terbaru
+            </p>
+          </div>
+        </div>
+        <div className="flex items-center gap-2">
+          <DesktopNavLinks />
+          <ThemeToggle />
         </div>
       </header>
 
@@ -120,17 +129,10 @@ export default async function HistoryPage() {
                 : null;
 
             return (
-              <article
-                key={log.id}
-                className="rounded-3xl p-5"
-                style={{
-                  backgroundColor: "var(--color-surface-container)",
-                  boxShadow: "var(--shadow-card)",
-                }}
-              >
+              <article key={log.id} className="clinical-card p-5">
                 <div className="flex items-start justify-between gap-4">
                   <div>
-                    <h2 style={{ fontSize: "18px", fontWeight: 600 }}>
+                    <h2 style={{ fontSize: "18px", fontWeight: 700, letterSpacing: "-0.01em" }}>
                       {formatDate(log.logDate)}
                     </h2>
                     <p
@@ -140,16 +142,14 @@ export default async function HistoryPage() {
                         color: "var(--color-on-surface-variant)",
                       }}
                     >
-                      {log.meals.length} makanan, {log.symptoms.length} gejala
+                      {log.meals.length} makanan · {log.symptoms.length} gejala
                     </p>
                   </div>
-                  <div
-                    className="flex min-w-16 flex-col items-center rounded-2xl px-3 py-2"
-                    style={{ backgroundColor: "var(--color-surface-container-lowest)" }}
-                  >
+                  <div className="flex min-w-16 flex-col items-center">
                     <span
+                      className="stat-number"
                       style={{
-                        fontSize: "22px",
+                        fontSize: "32px",
                         fontWeight: 700,
                         color: "var(--color-primary)",
                       }}
@@ -158,7 +158,10 @@ export default async function HistoryPage() {
                     </span>
                     <span
                       style={{
-                        fontSize: "11px",
+                        fontSize: "10px",
+                        fontWeight: 700,
+                        letterSpacing: "0.06em",
+                        textTransform: "uppercase",
                         color: "var(--color-on-surface-variant)",
                       }}
                     >
@@ -283,57 +286,6 @@ export default async function HistoryPage() {
           </div>
         )}
       </main>
-
-      <nav
-        className="fixed bottom-0 left-0 z-50 flex w-full items-center justify-around rounded-t-xl px-4 pb-4 pt-2 shadow-sm md:hidden"
-        style={{ backgroundColor: "var(--color-surface-container-lowest)" }}
-      >
-        <Link
-          href="/dashboard"
-          className="flex flex-col items-center justify-center rounded-full px-3 py-1"
-          style={{ color: "var(--color-on-surface-variant)" }}
-        >
-          <span className="material-symbols-outlined">home</span>
-          <span className="mt-1 font-semibold" style={{ fontSize: "11px" }}>
-            Home
-          </span>
-        </Link>
-        <Link
-          href="/dashboard/history"
-          className="flex flex-col items-center justify-center rounded-full px-3 py-1"
-          style={{
-            backgroundColor: "var(--color-secondary-container)",
-            color: "var(--color-on-secondary-container)",
-          }}
-        >
-          <span className="material-symbols-outlined" style={{ fontVariationSettings: "'FILL' 1" }}>
-            history
-          </span>
-          <span className="mt-1 font-semibold" style={{ fontSize: "11px" }}>
-            Riwayat
-          </span>
-        </Link>
-        <Link
-          href="/dashboard/analytics"
-          className="flex flex-col items-center justify-center rounded-full px-3 py-1"
-          style={{ color: "var(--color-on-surface-variant)" }}
-        >
-          <span className="material-symbols-outlined">monitoring</span>
-          <span className="mt-1 font-semibold" style={{ fontSize: "11px" }}>
-            Analitik
-          </span>
-        </Link>
-        <Link
-          href="/dashboard/profile"
-          className="flex flex-col items-center justify-center rounded-full px-3 py-1"
-          style={{ color: "var(--color-on-surface-variant)" }}
-        >
-          <span className="material-symbols-outlined">person</span>
-          <span className="mt-1 font-semibold" style={{ fontSize: "11px" }}>
-            Profil
-          </span>
-        </Link>
-      </nav>
     </div>
   );
 }

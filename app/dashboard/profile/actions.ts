@@ -22,6 +22,7 @@ export async function saveProfile(userId: string, data: {
       },
     });
     revalidatePath("/dashboard/profile");
+    revalidatePath("/dashboard");
     return { success: true, profile };
   } catch (error) {
     console.error("Failed to save profile:", error);

@@ -4,6 +4,8 @@ import { redirect } from "next/navigation";
 import prisma from "@/lib/prisma";
 import { getAnalyticsData } from "./actions";
 import AnalyticsCharts from "./AnalyticsCharts";
+import { DesktopNavLinks } from "../DashboardNav";
+import ThemeToggle from "../../ThemeToggle";
 
 const symptomLabels: Record<string, string> = {
   HEARTBURN: "Heartburn",
@@ -49,9 +51,10 @@ export default async function AnalyticsPage() {
       <header
         className="sticky top-0 z-40 flex h-[72px] items-center"
         style={{
-          backgroundColor: "rgba(247, 250, 245, 0.92)",
+          backgroundColor: "var(--color-header-bg)",
           backdropFilter: "blur(12px)",
           WebkitBackdropFilter: "blur(12px)",
+          borderBottom: "1px solid var(--color-outline-variant)",
           paddingLeft: "var(--spacing-lg)",
           paddingRight: "var(--spacing-lg)",
         }}
@@ -79,31 +82,9 @@ export default async function AnalyticsPage() {
             </p>
           </div>
           {/* Desktop Navigation Links */}
-          <div className="hidden md:flex items-center gap-1">
-            <Link 
-              href="/dashboard" 
-              className="px-4 py-2 rounded-full text-sm font-semibold text-[var(--color-on-surface-variant)] hover:bg-[var(--color-surface-container-low)] hover:text-[var(--color-primary)] transition-all"
-            >
-              Beranda
-            </Link>
-            <Link 
-              href="/dashboard/history" 
-              className="px-4 py-2 rounded-full text-sm font-semibold text-[var(--color-on-surface-variant)] hover:bg-[var(--color-surface-container-low)] hover:text-[var(--color-primary)] transition-all"
-            >
-              Riwayat
-            </Link>
-            <Link 
-              href="/dashboard/analytics" 
-              className="px-4 py-2 rounded-full text-sm font-semibold text-[var(--color-on-primary-container)] bg-[var(--color-primary-container)] transition-all"
-            >
-              Analitik
-            </Link>
-            <Link 
-              href="/dashboard/profile" 
-              className="px-4 py-2 rounded-full text-sm font-semibold text-[var(--color-on-surface-variant)] hover:bg-[var(--color-surface-container-low)] hover:text-[var(--color-primary)] transition-all"
-            >
-              Profil
-            </Link>
+          <div className="flex items-center gap-2">
+            <DesktopNavLinks />
+            <ThemeToggle />
           </div>
         </div>
       </header>
@@ -205,72 +186,6 @@ export default async function AnalyticsPage() {
         {/* ── Charts Visualization Component ── */}
         <AnalyticsCharts initialData={initialData} />
       </main>
-
-      {/* ── FAB (Catat Jurnal) ── */}
-      <div className="fixed bottom-24 left-0 w-full flex justify-center z-40 md:bottom-8">
-        <Link href="/dashboard/journal" className="flex items-center gap-2 px-6 py-4 rounded-full active:scale-95 transition-all duration-200 hover:opacity-90"
-          style={{ 
-            backgroundColor: "var(--color-primary)", 
-            color: "var(--color-on-primary)",
-            boxShadow: "var(--shadow-card-hover)" 
-          }}
-        >
-          <span className="material-symbols-outlined" style={{ fontVariationSettings: "'FILL' 1" }}>edit_document</span>
-          <span className="font-medium" style={{ fontSize: "14px" }}>Catat Jurnal</span>
-        </Link>
-      </div>
-
-      {/* ── BottomNavBar (Mobile Only) ── */}
-      <nav
-        className="fixed bottom-0 left-0 z-50 flex w-full items-center justify-around rounded-t-xl px-4 pb-4 pt-2 shadow-sm md:hidden"
-        style={{ backgroundColor: "var(--color-surface-container-lowest)" }}
-      >
-        <Link
-          href="/dashboard"
-          className="flex flex-col items-center justify-center rounded-full px-3 py-1"
-          style={{ color: "var(--color-on-surface-variant)" }}
-        >
-          <span className="material-symbols-outlined">home</span>
-          <span className="mt-1 font-semibold" style={{ fontSize: "11px" }}>
-            Home
-          </span>
-        </Link>
-        <Link
-          href="/dashboard/history"
-          className="flex flex-col items-center justify-center rounded-full px-3 py-1"
-          style={{ color: "var(--color-on-surface-variant)" }}
-        >
-          <span className="material-symbols-outlined">history</span>
-          <span className="mt-1 font-semibold" style={{ fontSize: "11px" }}>
-            Riwayat
-          </span>
-        </Link>
-        <Link
-          href="/dashboard/analytics"
-          className="flex flex-col items-center justify-center rounded-full px-3 py-1"
-          style={{
-            backgroundColor: "var(--color-secondary-container)",
-            color: "var(--color-on-secondary-container)",
-          }}
-        >
-          <span className="material-symbols-outlined" style={{ fontVariationSettings: "'FILL' 1" }}>
-            monitoring
-          </span>
-          <span className="mt-1 font-semibold" style={{ fontSize: "11px" }}>
-            Analitik
-          </span>
-        </Link>
-        <Link
-          href="/dashboard/profile"
-          className="flex flex-col items-center justify-center rounded-full px-3 py-1"
-          style={{ color: "var(--color-on-surface-variant)" }}
-        >
-          <span className="material-symbols-outlined">person</span>
-          <span className="mt-1 font-semibold" style={{ fontSize: "11px" }}>
-            Profil
-          </span>
-        </Link>
-      </nav>
     </div>
   );
 }

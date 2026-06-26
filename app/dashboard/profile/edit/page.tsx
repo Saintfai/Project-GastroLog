@@ -60,9 +60,10 @@ export default async function EditProfilePage() {
       <header
         className="fixed top-0 w-full z-50 flex items-center h-[72px]"
         style={{
-          backgroundColor: "rgba(247, 250, 245, 0.9)",
+          backgroundColor: "var(--color-header-bg)",
           backdropFilter: "blur(12px)",
           WebkitBackdropFilter: "blur(12px)",
+          borderBottom: "1px solid var(--color-outline-variant)",
           paddingLeft: "var(--spacing-lg)",
           paddingRight: "var(--spacing-lg)",
         }}
@@ -112,13 +113,7 @@ export default async function EditProfilePage() {
 
         <form action={handleSubmit} className="flex flex-col gap-6">
           {/* Card 1: Data Diri */}
-          <section
-            className="rounded-3xl p-5 flex flex-col gap-4"
-            style={{
-              backgroundColor: "var(--color-surface-container)",
-              boxShadow: "var(--shadow-card)",
-            }}
-          >
+          <section className="clinical-card p-5 flex flex-col gap-4">
             <h2 className="font-semibold text-base flex items-center gap-2" style={{ color: "var(--color-primary)" }}>
               <span className="material-symbols-outlined" style={{ fontSize: "20px" }}>person</span>
               Data Diri
@@ -156,13 +151,7 @@ export default async function EditProfilePage() {
           </section>
 
           {/* Card 2: Informasi Medis GERD */}
-          <section
-            className="rounded-3xl p-5 flex flex-col gap-4"
-            style={{
-              backgroundColor: "var(--color-surface-container)",
-              boxShadow: "var(--shadow-card)",
-            }}
-          >
+          <section className="clinical-card p-5 flex flex-col gap-4">
             <h2 className="font-semibold text-base flex items-center gap-2" style={{ color: "var(--color-primary)" }}>
               <span className="material-symbols-outlined" style={{ fontSize: "20px" }}>clinical_notes</span>
               Kondisi GERD
@@ -200,13 +189,7 @@ export default async function EditProfilePage() {
           </section>
 
           {/* Card 3: Obat & Pantangan */}
-          <section
-            className="rounded-3xl p-5 flex flex-col gap-4"
-            style={{
-              backgroundColor: "var(--color-surface-container)",
-              boxShadow: "var(--shadow-card)",
-            }}
-          >
+          <section className="clinical-card p-5 flex flex-col gap-4">
             <h2 className="font-semibold text-base flex items-center gap-2" style={{ color: "var(--color-primary)" }}>
               <span className="material-symbols-outlined" style={{ fontSize: "20px" }}>medical_services</span>
               Obat & Pantangan
