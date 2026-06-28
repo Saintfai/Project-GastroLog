@@ -175,6 +175,7 @@ model MealLog {
   notes      String?       @db.Text
 
   @@index([dailyLogId])
+  @@index([foodItemId])
   @@map("meal_logs")
 }
 
