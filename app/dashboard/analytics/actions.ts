@@ -4,20 +4,13 @@ import { auth } from "@/auth";
 import { redirect } from "next/navigation";
 import prisma from "@/lib/prisma";
 
-// Ambil userId dari session atau redirect ke login
+// Ambil userId dari session (sudah berisi id dari JWT) atau redirect ke login
 async function requireUserId(): Promise<string> {
   const session = await auth();
-  if (!session?.user?.email) {
+  if (!session?.user?.id) {
     redirect("/login");
   }
-  const user = await prisma.user.findUnique({
-    where: { email: session.user.email },
-    select: { id: true },
-  });
-  if (!user) {
-    redirect("/login");
-  }
-  return user.id;
+  return session.user.id;
 }
 
 export async function getAnalyticsData(period: number, passedUserId?: string) {

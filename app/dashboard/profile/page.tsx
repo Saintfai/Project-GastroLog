@@ -20,13 +20,15 @@ const genderLabels: Record<string, string> = {
 export default async function ProfilePage() {
   const session = await auth();
 
-  if (!session?.user?.email) {
+  if (!session?.user?.id) {
     redirect("/login");
   }
 
+  const userId = session.user.id;
+
   const [user, latestLog] = await Promise.all([
     prisma.user.findUnique({
-      where: { email: session.user.email },
+      where: { id: userId },
       include: {
         profile: true,
         _count: {
@@ -38,7 +40,7 @@ export default async function ProfilePage() {
       },
     }),
     prisma.dailyLog.findFirst({
-      where: { user: { email: session.user.email } },
+      where: { userId },
       orderBy: { logDate: "desc" },
       select: { logDate: true, overallScore: true },
     }),

@@ -61,18 +61,11 @@ export async function searchFoodItems(
 export async function createJournalEntry(data: JournalFormData) {
   const session = await auth();
 
-  if (!session?.user?.email) {
+  if (!session?.user?.id) {
     redirect("/login");
   }
 
-  // Cari user berdasarkan email dari session
-  const user = await prisma.user.findUnique({
-    where: { email: session.user.email },
-  });
-
-  if (!user) {
-    redirect("/login");
-  }
+  const userId = session.user.id;
 
   const today = new Date();
   // Set ke tanggal saja (tanpa jam) untuk logDate
@@ -84,7 +77,7 @@ export async function createJournalEntry(data: JournalFormData) {
   const dailyLog = await prisma.dailyLog.upsert({
     where: {
       userId_logDate: {
-        userId: user.id,
+        userId,
         logDate: logDate,
       },
     },
@@ -92,7 +85,7 @@ export async function createJournalEntry(data: JournalFormData) {
       notes: data.notes || undefined,
     },
     create: {
-      userId: user.id,
+      userId,
       logDate: logDate,
       notes: data.notes || undefined,
     },
@@ -226,20 +219,13 @@ export async function deleteSymptomLog(symptomLogId: string) {
   return { success: true };
 }
 
-// ─── Util: ambil userId dari session atau redirect ke login ─
+// ─── Util: ambil userId dari session (sudah berisi id dari JWT) ─
 async function requireUserId(): Promise<string> {
   const session = await auth();
-  if (!session?.user?.email) {
+  if (!session?.user?.id) {
     redirect("/login");
   }
-  const user = await prisma.user.findUnique({
-    where: { email: session.user.email },
-    select: { id: true },
-  });
-  if (!user) {
-    redirect("/login");
-  }
-  return user.id;
+  return session.user.id;
 }
 
 // ─── Util: setelah hapus, hitung ulang skor; hapus DailyLog

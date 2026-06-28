@@ -9,19 +9,11 @@ import ThemeToggle from "../ThemeToggle";
 export default async function DashboardPage() {
   const session = await auth();
 
-  if (!session?.user?.email) {
+  if (!session?.user?.id) {
     redirect("/login");
   }
 
-  const user = await prisma.user.findUnique({
-    where: { email: session.user.email },
-  });
-
-  if (!user) {
-    redirect("/login");
-  }
-
-  const { name, image } = session.user;
+  const { id: userId, name, image } = session.user;
   const firstName = name?.split(" ")[0] || "Pengguna";
 
   // Date boundaries for today
@@ -37,7 +29,7 @@ export default async function DashboardPage() {
     prisma.dailyLog.findUnique({
       where: {
         userId_logDate: {
-          userId: user.id,
+          userId,
           logDate: startOfToday,
         },
       },
@@ -53,14 +45,14 @@ export default async function DashboardPage() {
     }),
     prisma.symptomLog.findMany({
       where: {
-        dailyLog: { userId: user.id },
+        dailyLog: { userId },
         severity: { gte: 5 },
         onsetTime: { gte: sevenDaysAgo },
       },
       select: { dailyLogId: true },
     }),
     prisma.dailyLog.findMany({
-      where: { userId: user.id, logDate: { gte: sevenDaysAgo } },
+      where: { userId, logDate: { gte: sevenDaysAgo } },
       select: { logDate: true, overallScore: true },
       orderBy: { logDate: "asc" },
     }),

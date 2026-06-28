@@ -33,21 +33,12 @@ function formatTime(date: Date) {
 export default async function HistoryPage() {
   const session = await auth();
 
-  if (!session?.user?.email) {
-    redirect("/login");
-  }
-
-  const user = await prisma.user.findUnique({
-    where: { email: session.user.email },
-    select: { id: true },
-  });
-
-  if (!user) {
+  if (!session?.user?.id) {
     redirect("/login");
   }
 
   const logs = await prisma.dailyLog.findMany({
-    where: { userId: user.id },
+    where: { userId: session.user.id },
     include: {
       meals: {
         include: { foodItem: true },

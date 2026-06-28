@@ -1,7 +1,6 @@
 import Link from "next/link";
 import { auth } from "@/auth";
 import { redirect } from "next/navigation";
-import prisma from "@/lib/prisma";
 import { getAnalyticsData } from "./actions";
 import AnalyticsCharts from "./AnalyticsCharts";
 import { DesktopNavLinks } from "../DashboardNav";
@@ -20,21 +19,12 @@ const symptomLabels: Record<string, string> = {
 export default async function AnalyticsPage() {
   const session = await auth();
 
-  if (!session?.user?.email) {
-    redirect("/login");
-  }
-
-  const user = await prisma.user.findUnique({
-    where: { email: session.user.email },
-    select: { id: true },
-  });
-
-  if (!user) {
+  if (!session?.user?.id) {
     redirect("/login");
   }
 
   // Load data awal untuk rentang waktu default (7 hari)
-  const initialData = await getAnalyticsData(7, user.id);
+  const initialData = await getAnalyticsData(7, session.user.id);
   const { summary } = initialData;
 
   const translatedSymptom = symptomLabels[summary.mostFrequentSymptom] || summary.mostFrequentSymptom;
