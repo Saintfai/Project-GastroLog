@@ -1,10 +1,7 @@
-import Link from "next/link";
-import { auth } from "@/auth";
-import { redirect } from "next/navigation";
+import { requireSession } from "@/lib/auth-utils";
 import { getAnalyticsData } from "./actions";
 import AnalyticsCharts from "./AnalyticsCharts";
-import { DesktopNavLinks } from "../DashboardNav";
-import ThemeToggle from "../../ThemeToggle";
+import PageHeader from "@/components/PageHeader";
 
 const symptomLabels: Record<string, string> = {
   HEARTBURN: "Heartburn",
@@ -17,14 +14,11 @@ const symptomLabels: Record<string, string> = {
 };
 
 export default async function AnalyticsPage() {
-  const session = await auth();
-
-  if (!session?.user?.id) {
-    redirect("/login");
-  }
+  // Ambil session secara aman
+  await requireSession();
 
   // Load data awal untuk rentang waktu default (7 hari)
-  const initialData = await getAnalyticsData(7, session.user.id);
+  const initialData = await getAnalyticsData(7);
   const { summary } = initialData;
 
   const translatedSymptom = symptomLabels[summary.mostFrequentSymptom] || summary.mostFrequentSymptom;
@@ -37,47 +31,12 @@ export default async function AnalyticsPage() {
         color: "var(--color-on-surface)",
       }}
     >
-      {/* ── Header ── */}
-      <header
-        className="sticky top-0 z-40 flex h-[72px] items-center"
-        style={{
-          backgroundColor: "var(--color-header-bg)",
-          backdropFilter: "blur(12px)",
-          WebkitBackdropFilter: "blur(12px)",
-          borderBottom: "1px solid var(--color-outline-variant)",
-          paddingLeft: "var(--spacing-lg)",
-          paddingRight: "var(--spacing-lg)",
-        }}
-      >
-        <Link
-          href="/dashboard"
-          className="flex items-center justify-center rounded-full transition-opacity hover:opacity-80 active:scale-95"
-          style={{
-            width: "var(--touch-target-min)",
-            height: "var(--touch-target-min)",
-            color: "var(--color-on-surface)",
-          }}
-        >
-          <span className="material-symbols-outlined" style={{ fontSize: "28px" }}>
-            arrow_back
-          </span>
-        </Link>
-        <div className="ml-2 flex-1 flex justify-between items-center">
-          <div>
-            <h1 style={{ fontSize: "24px", fontWeight: 600, lineHeight: "32px" }}>
-              Analitik
-            </h1>
-            <p style={{ fontSize: "13px", color: "var(--color-on-surface-variant)" }}>
-              Ringkasan statistik & tren kesehatan
-            </p>
-          </div>
-          {/* Desktop Navigation Links */}
-          <div className="flex items-center gap-2">
-            <DesktopNavLinks />
-            <ThemeToggle />
-          </div>
-        </div>
-      </header>
+      {/* ── PageHeader ── */}
+      <PageHeader
+        title="Analitik"
+        subtitle="Ringkasan statistik & tren kesehatan"
+        backHref="/dashboard"
+      />
 
       {/* ── Main Content ── */}
       <main

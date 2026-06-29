@@ -1,9 +1,8 @@
 import Link from "next/link";
-import { auth, signOut } from "@/auth";
-import { redirect } from "next/navigation";
+import { signOut } from "@/auth";
+import { requireUserId } from "@/lib/auth-utils";
 import prisma from "@/lib/prisma";
-import { DesktopNavLinks } from "../DashboardNav";
-import ThemeToggle from "../../ThemeToggle";
+import PageHeader from "@/components/PageHeader";
 
 const severityLabels: Record<string, string> = {
   MILD: "Ringan",
@@ -18,13 +17,7 @@ const genderLabels: Record<string, string> = {
 };
 
 export default async function ProfilePage() {
-  const session = await auth();
-
-  if (!session?.user?.id) {
-    redirect("/login");
-  }
-
-  const userId = session.user.id;
+  const userId = await requireUserId();
 
   const [user, latestLog] = await Promise.all([
     prisma.user.findUnique({
@@ -47,7 +40,8 @@ export default async function ProfilePage() {
   ]);
 
   if (!user) {
-    redirect("/login");
+    // Session exists but user not found in DB
+    return null;
   }
 
   return (
@@ -58,45 +52,11 @@ export default async function ProfilePage() {
         color: "var(--color-on-surface)",
       }}
     >
-      <header
-        className="sticky top-0 z-40 flex h-[72px] items-center justify-between"
-        style={{
-          backgroundColor: "var(--color-header-bg)",
-          backdropFilter: "blur(12px)",
-          WebkitBackdropFilter: "blur(12px)",
-          borderBottom: "1px solid var(--color-outline-variant)",
-          paddingLeft: "var(--spacing-lg)",
-          paddingRight: "var(--spacing-lg)",
-        }}
-      >
-        <div className="flex items-center">
-          <Link
-            href="/dashboard"
-            className="flex items-center justify-center rounded-full transition-opacity hover:opacity-80 active:scale-95"
-            style={{
-              width: "var(--touch-target-min)",
-              height: "var(--touch-target-min)",
-              color: "var(--color-on-surface)",
-            }}
-          >
-            <span className="material-symbols-outlined" style={{ fontSize: "28px" }}>
-              arrow_back
-            </span>
-          </Link>
-          <div className="ml-2">
-            <h1 style={{ fontSize: "22px", fontWeight: 700, lineHeight: "28px", letterSpacing: "-0.02em" }}>
-              Profil
-            </h1>
-            <p style={{ fontSize: "13px", color: "var(--color-on-surface-variant)" }}>
-              Akun dan ringkasan penggunaan
-            </p>
-          </div>
-        </div>
-        <div className="flex items-center gap-2">
-          <DesktopNavLinks />
-          <ThemeToggle />
-        </div>
-      </header>
+      <PageHeader
+        title="Profil"
+        subtitle="Akun dan ringkasan penggunaan"
+        backHref="/dashboard"
+      />
 
       <main
         className="mx-auto flex max-w-2xl flex-col gap-5"

@@ -1,13 +1,12 @@
-import { auth } from "@/auth";
+import { requireSession } from "@/lib/auth-utils";
 import { redirect } from "next/navigation";
 import prisma from "@/lib/prisma";
 import { saveProfile } from "../actions";
 import { Gender, GerdSeverity } from "@prisma/client";
-import Link from "next/link";
+import PageHeader from "@/components/PageHeader";
 
 export default async function EditProfilePage() {
-  const session = await auth();
-  if (!session?.user?.id) redirect("/login");
+  const session = await requireSession();
 
   const user = await prisma.user.findUnique({
     where: { id: session.user.id },
@@ -20,8 +19,7 @@ export default async function EditProfilePage() {
 
   async function handleSubmit(formData: FormData) {
     "use server";
-    if (!user) return;
-
+    
     const ageRaw = formData.get("age");
     const durationRaw = formData.get("gerdDurationMonths");
 
@@ -42,11 +40,13 @@ export default async function EditProfilePage() {
         .filter(s => s.length > 0) || [],
     };
 
-    const result = await saveProfile(user.id, data);
+    const result = await saveProfile(data);
     if (result.success) {
       redirect("/dashboard/profile");
     }
   }
+
+  const headerTitle = profile ? "Edit Profil GERD" : "Lengkapi Profil GERD";
 
   return (
     <div
@@ -56,52 +56,18 @@ export default async function EditProfilePage() {
         color: "var(--color-on-surface)",
       }}
     >
-      {/* ── Fixed Header ── */}
-      <header
-        className="fixed top-0 w-full z-50 flex items-center h-[72px]"
-        style={{
-          backgroundColor: "var(--color-header-bg)",
-          backdropFilter: "blur(12px)",
-          WebkitBackdropFilter: "blur(12px)",
-          borderBottom: "1px solid var(--color-outline-variant)",
-          paddingLeft: "var(--spacing-lg)",
-          paddingRight: "var(--spacing-lg)",
-        }}
-      >
-        <Link
-          href="/dashboard/profile"
-          className="flex items-center justify-start rounded-full transition-opacity hover:opacity-80 active:scale-95"
-          style={{
-            width: "var(--touch-target-min)",
-            height: "var(--touch-target-min)",
-            color: "var(--color-on-surface)",
-          }}
-        >
-          <span className="material-symbols-outlined" style={{ fontSize: "28px" }}>
-            arrow_back
-          </span>
-        </Link>
-        <h1
-          className="ml-2"
-          style={{
-            fontSize: "24px",
-            fontWeight: 500,
-            lineHeight: "32px",
-            letterSpacing: "-0.01em",
-            color: "var(--color-on-surface)",
-          }}
-        >
-          {profile ? "Edit Profil GERD" : "Lengkapi Profil GERD"}
-        </h1>
-      </header>
+      <PageHeader
+        title={headerTitle}
+        backHref="/dashboard/profile"
+      />
 
       {/* ── Main Content ── */}
       <main
         className="mx-auto flex flex-col gap-6"
         style={{
-          paddingTop: "96px",
           paddingLeft: "var(--spacing-lg)",
           paddingRight: "var(--spacing-lg)",
+          paddingTop: "var(--spacing-lg)",
           maxWidth: "512px",
         }}
       >
@@ -247,4 +213,3 @@ export default async function EditProfilePage() {
     </div>
   );
 }
-

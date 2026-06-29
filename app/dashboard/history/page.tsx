@@ -1,9 +1,7 @@
 import Link from "next/link";
-import { auth } from "@/auth";
-import { redirect } from "next/navigation";
+import { requireUserId } from "@/lib/auth-utils";
 import prisma from "@/lib/prisma";
-import { DesktopNavLinks } from "../DashboardNav";
-import ThemeToggle from "../../ThemeToggle";
+import PageHeader from "@/components/PageHeader";
 
 const symptomLabels: Record<string, string> = {
   HEARTBURN: "Heartburn",
@@ -31,14 +29,10 @@ function formatTime(date: Date) {
 }
 
 export default async function HistoryPage() {
-  const session = await auth();
-
-  if (!session?.user?.id) {
-    redirect("/login");
-  }
+  const userId = await requireUserId();
 
   const logs = await prisma.dailyLog.findMany({
-    where: { userId: session.user.id },
+    where: { userId },
     include: {
       meals: {
         include: { foodItem: true },
@@ -61,45 +55,11 @@ export default async function HistoryPage() {
         color: "var(--color-on-surface)",
       }}
     >
-      <header
-        className="sticky top-0 z-40 flex h-[72px] items-center justify-between"
-        style={{
-          backgroundColor: "var(--color-header-bg)",
-          backdropFilter: "blur(12px)",
-          WebkitBackdropFilter: "blur(12px)",
-          borderBottom: "1px solid var(--color-outline-variant)",
-          paddingLeft: "var(--spacing-lg)",
-          paddingRight: "var(--spacing-lg)",
-        }}
-      >
-        <div className="flex items-center">
-          <Link
-            href="/dashboard"
-            className="flex items-center justify-center rounded-full transition-opacity hover:opacity-80 active:scale-95"
-            style={{
-              width: "var(--touch-target-min)",
-              height: "var(--touch-target-min)",
-              color: "var(--color-on-surface)",
-            }}
-          >
-            <span className="material-symbols-outlined" style={{ fontSize: "28px" }}>
-              arrow_back
-            </span>
-          </Link>
-          <div className="ml-2">
-            <h1 style={{ fontSize: "22px", fontWeight: 700, lineHeight: "28px", letterSpacing: "-0.02em" }}>
-              Riwayat
-            </h1>
-            <p style={{ fontSize: "13px", color: "var(--color-on-surface-variant)" }}>
-              30 catatan terbaru
-            </p>
-          </div>
-        </div>
-        <div className="flex items-center gap-2">
-          <DesktopNavLinks />
-          <ThemeToggle />
-        </div>
-      </header>
+      <PageHeader
+        title="Riwayat"
+        subtitle="30 catatan terbaru"
+        backHref="/dashboard"
+      />
 
       <main
         className="mx-auto flex max-w-3xl flex-col gap-4"
