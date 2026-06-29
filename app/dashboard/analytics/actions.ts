@@ -1,20 +1,16 @@
 "use server";
 
-import { auth } from "@/auth";
-import { redirect } from "next/navigation";
 import prisma from "@/lib/prisma";
+import { requireUserId } from "@/lib/auth-utils";
 
-// Ambil userId dari session (sudah berisi id dari JWT) atau redirect ke login
-async function requireUserId(): Promise<string> {
-  const session = await auth();
-  if (!session?.user?.id) {
-    redirect("/login");
+export async function getAnalyticsData(period: number) {
+  // Selalu dapatkan userId secara aman dari session
+  const userId = await requireUserId();
+
+  // Validasi period
+  if (![7, 14, 30].includes(period)) {
+    throw new Error("Periode tidak valid");
   }
-  return session.user.id;
-}
-
-export async function getAnalyticsData(period: number, passedUserId?: string) {
-  const userId = passedUserId || await requireUserId();
 
   const today = new Date();
   const startOfToday = new Date(today.getFullYear(), today.getMonth(), today.getDate());
@@ -135,7 +131,6 @@ export async function getAnalyticsData(period: number, passedUserId?: string) {
   };
 
   dailyLogs.forEach(log => {
-    // Di schema.prisma, dailyLogs has many activities. Kita ambil yang pertama jika ada.
     const activity = log.activities[0];
     if (activity && activity.stressLevel) {
       const stress = activity.stressLevel;

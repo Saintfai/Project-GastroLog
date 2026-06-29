@@ -1,10 +1,11 @@
 "use server";
 
-import { auth } from "@/auth";
 import prisma from "@/lib/prisma";
 import { redirect } from "next/navigation";
 import { revalidatePath } from "next/cache";
 import type { MealType, PortionSize, SymptomType } from "@prisma/client";
+import { requireUserId } from "@/lib/auth-utils";
+import { JournalEntrySchema, FoodSearchSchema } from "@/lib/validations/journal";
 
 // ─── Types ────────────────────────────────────────────────
 export type FoodSearchResult = {
@@ -30,14 +31,16 @@ type JournalFormData = {
 export async function searchFoodItems(
   query: string
 ): Promise<FoodSearchResult[]> {
-  if (!query || query.trim().length < 2) {
-    return [];
-  }
+  // Pastikan user sudah login
+  await requireUserId();
+
+  // Validasi query
+  const validatedQuery = FoodSearchSchema.parse(query);
 
   const results = await prisma.foodItem.findMany({
     where: {
       name: {
-        contains: query.trim(),
+        contains: validatedQuery.trim(),
         mode: "insensitive",
       },
     },
@@ -59,21 +62,16 @@ export async function searchFoodItems(
 
 // ─── Create Journal Entry ─────────────────────────────────
 export async function createJournalEntry(data: JournalFormData) {
-  const session = await auth();
+  const userId = await requireUserId();
 
-  if (!session?.user?.id) {
-    redirect("/login");
-  }
-
-  const userId = session.user.id;
+  // Validasi input menggunakan schema Zod
+  const validatedData = JournalEntrySchema.parse(data);
 
   const today = new Date();
   // Set ke tanggal saja (tanpa jam) untuk logDate
   const logDate = new Date(today.getFullYear(), today.getMonth(), today.getDate());
 
   // Upsert DailyLog (buat baru jika belum ada hari ini, atau gunakan yang ada).
-  // Skor TIDAK dihitung di sini; dihitung ulang dari data seluruh hari setelah
-  // entri ditambahkan (lihat bagian "Hitung ulang skor harian" di bawah).
   const dailyLog = await prisma.dailyLog.upsert({
     where: {
       userId_logDate: {
@@ -82,12 +80,12 @@ export async function createJournalEntry(data: JournalFormData) {
       },
     },
     update: {
-      notes: data.notes || undefined,
+      notes: validatedData.notes || undefined,
     },
     create: {
       userId,
       logDate: logDate,
-      notes: data.notes || undefined,
+      notes: validatedData.notes || undefined,
     },
   });
 
@@ -97,22 +95,22 @@ export async function createJournalEntry(data: JournalFormData) {
   await prisma.mealLog.create({
     data: {
       dailyLogId: dailyLog.id,
-      foodItemId: data.foodItemId || undefined,
-      mealType: data.mealType,
-      foodName: data.foodName,
+      foodItemId: validatedData.foodItemId || undefined,
+      mealType: validatedData.mealType,
+      foodName: validatedData.foodName,
       mealTime: now,
-      portionSize: data.portionSize,
+      portionSize: validatedData.portionSize,
       notes: null,
     },
   });
 
   // Buat SymptomLog untuk setiap jenis gejala yang dipilih
-  if (data.symptomTypes.length > 0) {
+  if (validatedData.symptomTypes.length > 0) {
     await prisma.symptomLog.createMany({
-      data: data.symptomTypes.map((symptomType) => ({
+      data: validatedData.symptomTypes.map((symptomType) => ({
         dailyLogId: dailyLog.id,
         symptomType: symptomType,
-        severity: data.severity,
+        severity: validatedData.severity,
         onsetTime: now,
         durationMinutes: null,
         notes: null,
@@ -124,7 +122,7 @@ export async function createJournalEntry(data: JournalFormData) {
   await prisma.activityLog.create({
     data: {
       dailyLogId: dailyLog.id,
-      stressLevel: data.stressLevel,
+      stressLevel: validatedData.stressLevel,
       sleepHours: null,
       sleepPosition: null,
       exerciseDone: false,
@@ -143,11 +141,6 @@ export async function createJournalEntry(data: JournalFormData) {
 }
 
 // ─── Hitung ulang skor harian dari SELURUH data hari itu ───
-// Skor mencerminkan kondisi sepanjang hari, bukan hanya satu entri.
-// - Gejala: dipakai keparahan rata-rata (semakin parah = skor turun).
-//   Hari tanpa gejala sama sekali tidak dihukum (severity dianggap 0).
-// - Stres: rata-rata stres harian memberi bonus/penalti (-2..+2).
-// Helper internal (tidak diekspor) supaya tidak menjadi server action publik.
 async function recalcDailyScore(dailyLogId: string) {
   const [symptomAgg, stressAgg] = await Promise.all([
     prisma.symptomLog.aggregate({
@@ -217,15 +210,6 @@ export async function deleteSymptomLog(symptomLogId: string) {
   revalidatePath("/dashboard/analytics");
   revalidatePath("/dashboard/profile");
   return { success: true };
-}
-
-// ─── Util: ambil userId dari session (sudah berisi id dari JWT) ─
-async function requireUserId(): Promise<string> {
-  const session = await auth();
-  if (!session?.user?.id) {
-    redirect("/login");
-  }
-  return session.user.id;
 }
 
 // ─── Util: setelah hapus, hitung ulang skor; hapus DailyLog
