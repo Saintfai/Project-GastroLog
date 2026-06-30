@@ -19,9 +19,9 @@ const CATEGORIES = [
 
 const RISK_LEVELS = [
   { value: "ALL", label: "Semua Risiko" },
-  { value: "LOW", label: "🟢 Aman" },
-  { value: "MEDIUM", label: "🟡 Sedang" },
-  { value: "HIGH", label: "🔴 Berisiko" },
+  { value: "LOW", label: "Aman" },
+  { value: "MEDIUM", label: "Sedang" },
+  { value: "HIGH", label: "Berisiko" },
 ] as const;
 
 export default function FoodFilters() {
@@ -226,9 +226,9 @@ export default function FoodFilters() {
                   className="food-search-input w-full"
                   style={{ height: "48px", borderRadius: "var(--radius-lg)", paddingLeft: "16px" }}
                 >
-                  <option value="LOW">🟢 Aman (Ramah Lambung)</option>
-                  <option value="MEDIUM">🟡 Sedang (Tergantung Porsi)</option>
-                  <option value="HIGH">🔴 Berisiko (Pemicu Utama)</option>
+                  <option value="LOW">Aman (Ramah Lambung)</option>
+                  <option value="MEDIUM">Sedang (Tergantung Porsi)</option>
+                  <option value="HIGH">Berisiko (Pemicu Utama)</option>
                 </select>
               </div>
 

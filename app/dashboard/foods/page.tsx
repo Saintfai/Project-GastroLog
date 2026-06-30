@@ -45,9 +45,9 @@ export default async function FoodDatabasePage({ searchParams }: PageProps) {
 
   const getRiskLabel = (level: string) => {
     switch (level) {
-      case "LOW": return "🟢 Aman";
-      case "MEDIUM": return "🟡 Sedang";
-      case "HIGH": return "🔴 Berisiko";
+      case "LOW": return "Aman";
+      case "MEDIUM": return "Sedang";
+      case "HIGH": return "Berisiko";
       default: return level;
     }
   };
@@ -77,19 +77,19 @@ export default async function FoodDatabasePage({ searchParams }: PageProps) {
         {/* Summary Stats */}
         <div className="flex flex-wrap gap-3">
           <div className="stat-chip">
-            <span>📦 Total:</span>
+            <span>Total:</span>
             <span style={{ color: "var(--color-primary)" }}>{stats.total}</span>
           </div>
           <div className="stat-chip">
-            <span>🟢 Aman:</span>
+            <span>Aman:</span>
             <span>{stats.low}</span>
           </div>
           <div className="stat-chip">
-            <span>🟡 Sedang:</span>
+            <span>Sedang:</span>
             <span>{stats.medium}</span>
           </div>
           <div className="stat-chip">
-            <span>🔴 Berisiko:</span>
+            <span>Berisiko:</span>
             <span>{stats.high}</span>
           </div>
         </div>
@@ -121,7 +121,7 @@ export default async function FoodDatabasePage({ searchParams }: PageProps) {
                   }}
                 >
                   <span className="bg-gray-100 dark:bg-gray-800 px-2.5 py-1 rounded-md">
-                    📁 {CATEGORY_LABELS[food.category] || food.category}
+                    {CATEGORY_LABELS[food.category] || food.category}
                   </span>
                   {!food.isVerified && (
                     <span
@@ -131,7 +131,7 @@ export default async function FoodDatabasePage({ searchParams }: PageProps) {
                         color: "var(--color-on-secondary-container)",
                       }}
                     >
-                      ✨ Custom
+                      Custom
                     </span>
                   )}
                 </div>
