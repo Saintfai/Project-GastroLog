@@ -15,7 +15,6 @@ export async function addCustomFood(data: AddFoodItemInput) {
       name: validatedData.name.trim(),
       category: validatedData.category,
       gerdRiskLevel: validatedData.gerdRiskLevel,
-      description: validatedData.description?.trim() || null,
       isVerified: false,
     },
   });

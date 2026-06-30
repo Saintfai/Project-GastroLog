@@ -13,7 +13,6 @@ export type FoodSearchResult = {
   name: string;
   category: string;
   gerdRiskLevel: string;
-  description: string | null;
 };
 
 type JournalFormData = {
@@ -49,7 +48,6 @@ export async function searchFoodItems(
       name: true,
       category: true,
       gerdRiskLevel: true,
-      description: true,
     },
     take: 8,
     orderBy: {

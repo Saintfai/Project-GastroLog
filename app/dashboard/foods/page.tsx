@@ -111,29 +111,6 @@ export default async function FoodDatabasePage({ searchParams }: PageProps) {
                       {getRiskLabel(food.gerdRiskLevel)}
                     </span>
                   </div>
-
-                  {food.description ? (
-                    <p
-                      className="mb-4"
-                      style={{
-                        fontSize: "14px",
-                        lineHeight: "22px",
-                        color: "var(--color-on-surface-variant)",
-                      }}
-                    >
-                      {food.description}
-                    </p>
-                  ) : (
-                    <p
-                      className="mb-4 italic"
-                      style={{
-                        fontSize: "13px",
-                        color: "var(--color-outline)",
-                      }}
-                    >
-                      Tidak ada deskripsi khusus.
-                    </p>
-                  )}
                 </div>
 
                 <div

@@ -40,7 +40,6 @@ export default function FoodFilters() {
   const [formName, setFormName] = useState("");
   const [formCategory, setFormCategory] = useState<FoodCategory>("SNACK");
   const [formRisk, setFormRisk] = useState<GerdRiskLevel>("MEDIUM");
-  const [formDesc, setFormDesc] = useState("");
   const [formError, setFormError] = useState<string | null>(null);
 
   // Debounced Search Update
@@ -77,11 +76,9 @@ export default function FoodFilters() {
           name: formName.trim(),
           category: formCategory,
           gerdRiskLevel: formRisk,
-          description: formDesc.trim() || null,
         });
         setIsModalOpen(false);
         setFormName("");
-        setFormDesc("");
       } catch (err) {
         setFormError("Gagal menambahkan makanan. Silakan coba lagi.");
       }
@@ -235,16 +232,7 @@ export default function FoodFilters() {
                 </select>
               </div>
 
-              <div>
-                <label className="block mb-1 text-sm font-medium">Deskripsi / Catatan (Opsional)</label>
-                <textarea
-                  placeholder="Alasan risiko atau tips konsumsi..."
-                  value={formDesc}
-                  onChange={(e) => setFormDesc(e.target.value)}
-                  className="journal-textarea w-full"
-                  rows={3}
-                />
-              </div>
+
 
               <div className="flex gap-3 justify-end mt-2">
                 <button

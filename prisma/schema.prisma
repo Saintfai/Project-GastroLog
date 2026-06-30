@@ -214,7 +214,6 @@ model FoodItem {
   name          String
   category      FoodCategory
   gerdRiskLevel GerdRiskLevel @map("gerd_risk_level")
-  description   String?       @db.Text
   isVerified    Boolean       @default(false) @map("is_verified")
   
   mealLogs      MealLog[]

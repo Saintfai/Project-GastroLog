@@ -325,19 +325,6 @@ export default function JournalFormPage() {
                       >
                         {food.name}
                       </span>
-                      {food.description && (
-                        <span
-                          style={{
-                            fontSize: "12px",
-                            color: "var(--color-on-surface-variant)",
-                            lineHeight: "16px",
-                          }}
-                        >
-                          {food.description.length > 60
-                            ? food.description.slice(0, 60) + "..."
-                            : food.description}
-                        </span>
-                      )}
                     </div>
                     <span className={getRiskBadgeClass(food.gerdRiskLevel)}>
                       {getRiskLabel(food.gerdRiskLevel)}
