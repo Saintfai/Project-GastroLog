@@ -192,9 +192,9 @@ export default async function Home() {
                 color: "var(--color-on-surface)",
               }}
             >
-              Pahami Asam Lambungmu, Kembalikan Kenyamanan{" "}
+              Track your food,{" "}
               <span className="bg-gradient-to-r from-[var(--color-primary)] to-[var(--color-inverse-primary)] bg-clip-text text-transparent">
-                Hidupmu
+                boost your mood
               </span>
             </h1>
 
